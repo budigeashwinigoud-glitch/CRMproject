@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Belvo Internal CRM & AI-Powered Lead Management System
 
 A polished, high-performance, responsive React CRM frontend engineered for internal B2B Open Finance lead management and sales pipeline operations across Latin America.
@@ -133,3 +134,6 @@ CRMPROJECT/
 ├── package.json
 └── README.md
 ```
+=======
+# CRMproject
+>>>>>>> 86480190ed2adb44a7f93ecd332b7947e4cdd64e
