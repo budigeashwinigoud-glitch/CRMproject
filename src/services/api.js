@@ -9,15 +9,22 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 /**
- * Standard fetch helper with error handling
+ * Standard fetch helper with error handling & token attachment
  */
 async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
+  const token = localStorage.getItem('belvo_crm_token');
+
   const headers = {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
+
+  // Only set application/json if body is not FormData
+  if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   const config = {
     ...options,
@@ -51,6 +58,28 @@ export const crmApi = {
     return request('/health');
   },
 
+  // Auth Endpoints
+  login: async (email, password) => {
+    const data = await request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    if (data?.access_token) {
+      localStorage.setItem('belvo_crm_token', data.access_token);
+      localStorage.setItem('belvo_crm_user', JSON.stringify(data.user));
+    }
+    return data;
+  },
+
+  logout: () => {
+    localStorage.removeItem('belvo_crm_token');
+    localStorage.removeItem('belvo_crm_user');
+  },
+
+  getMe: async () => {
+    return request('/auth/me');
+  },
+
   // Leads CRUD
   getLeads: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -81,6 +110,18 @@ export const crmApi = {
     });
   },
 
+  archiveLead: async (id) => {
+    return request(`/leads/${id}/archive`, {
+      method: 'POST'
+    });
+  },
+
+  restoreLead: async (id) => {
+    return request(`/leads/${id}/restore`, {
+      method: 'POST'
+    });
+  },
+
   updateLeadStage: async (id, newStage) => {
     return request(`/leads/${id}/stage`, {
       method: 'PATCH',
@@ -88,9 +129,34 @@ export const crmApi = {
     });
   },
 
+  reassignLead: async (id, assignedEmployee, assignedUserId = null) => {
+    return request(`/leads/${id}/assignment`, {
+      method: 'PATCH',
+      body: JSON.stringify({ assignedEmployee, assignedUserId })
+    });
+  },
+
+  checkDuplicates: async (leadData) => {
+    return request('/leads/duplicates/check', {
+      method: 'POST',
+      body: JSON.stringify(leadData)
+    });
+  },
+
+  // Pipeline Stages
+  getPipelineStages: async () => {
+    return request('/pipeline/stages');
+  },
+
   // Dashboard & Metrics
-  getDashboardMetrics: async () => {
-    return request('/dashboard/metrics');
+  getDashboardMetrics: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/dashboard/metrics${query ? `?${query}` : ''}`);
+  },
+
+  getEmployeeMetrics: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/dashboard/employee-metrics${query ? `?${query}` : ''}`);
   },
 
   // Follow-ups
@@ -113,7 +179,13 @@ export const crmApi = {
     });
   },
 
-  // Activity Logs
+  deleteFollowUp: async (id) => {
+    return request(`/follow-ups/${id}`, {
+      method: 'DELETE'
+    });
+  },
+
+  // Activity Logs & Notes
   getActivities: async (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return request(`/activities${query ? `?${query}` : ''}`);
@@ -124,6 +196,32 @@ export const crmApi = {
       method: 'POST',
       body: JSON.stringify(activityData)
     });
+  },
+
+  getLeadNotes: async (leadId) => {
+    return request(`/leads/${leadId}/notes`);
+  },
+
+  createLeadNote: async (leadId, noteData) => {
+    return request(`/leads/${leadId}/notes`, {
+      method: 'POST',
+      body: JSON.stringify(noteData)
+    });
+  },
+
+  // CSV & Excel Import / Export
+  importLeads: async (file, dryRun = false, updateDuplicates = false) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return request(`/import/leads?dry_run=${dryRun}&update_duplicates=${updateDuplicates}`, {
+      method: 'POST',
+      body: formData
+    });
+  },
+
+  getExportLeadsUrl: (format = 'csv', filters = {}) => {
+    const query = new URLSearchParams({ format, ...filters }).toString();
+    return `${API_BASE_URL}/export/leads?${query}`;
   }
 };
 

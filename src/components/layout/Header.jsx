@@ -12,7 +12,7 @@ import { useCRM } from '../../context/CRMContext';
 
 export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
   const navigate = useNavigate();
-  const { followUps } = useCRM();
+  const { followUps, backendConnected } = useCRM();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -93,17 +93,17 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             alignItems: 'center',
             gap: 6,
             padding: '4px 10px',
-            backgroundColor: '#eff6ff',
-            border: '1px solid #bfdbfe',
+            backgroundColor: backendConnected ? '#f0fdf4' : '#eff6ff',
+            border: backendConnected ? '1px solid #bbf7d0' : '1px solid #bfdbfe',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.75rem',
             fontWeight: 600,
-            color: '#1d4ed8'
+            color: backendConnected ? '#15803d' : '#1d4ed8'
           }}
-          title="Centralized Mock & LocalStorage active. Ready for Backend API integration."
+          title={backendConnected ? "Connected to Belvo FastAPI REST API & Database." : "Centralized Mock & LocalStorage active."}
         >
-          <ShieldCheck size={14} color="#2563eb" />
-          <span>Local Demo Storage</span>
+          <ShieldCheck size={14} color={backendConnected ? "#16a34a" : "#2563eb"} />
+          <span>{backendConnected ? "FastAPI Live" : "Local Demo Storage"}</span>
         </div>
 
         {/* Add Lead Primary CTA */}

@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import LeadDetailModal from '../components/leads/LeadDetailModal';
 import LeadFormModal from '../components/leads/LeadFormModal';
 import { PIPELINE_STAGES, LEAD_SOURCES, PRIORITIES, EMPLOYEES } from '../services/mockData';
+import crmApi from '../services/api';
 import {
   Search,
   Plus,
@@ -15,11 +16,13 @@ import {
   Edit2,
   Trash2,
   Calendar,
-  RotateCcw
+  RotateCcw,
+  Download,
+  Upload
 } from 'lucide-react';
 
 export const LeadsPage = () => {
-  const { leads, deleteLead } = useCRM();
+  const { leads, deleteLead, showToast, refreshData } = useCRM();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Search & Filters State
@@ -69,6 +72,38 @@ export const LeadsPage = () => {
     setSelectedEmployee('All');
     setSearchParams({});
     setCurrentPage(1);
+  };
+
+  const fileInputRef = React.useRef(null);
+
+  const handleExport = (format = 'csv') => {
+    try {
+      const filters = {};
+      if (selectedStage !== 'All') filters.stage = selectedStage;
+      if (selectedPriority !== 'All') filters.priority = selectedPriority;
+      if (selectedSource !== 'All') filters.source = selectedSource;
+      if (selectedEmployee !== 'All') filters.employee = selectedEmployee;
+      const url = crmApi.getExportLeadsUrl(format, filters);
+      window.open(url, '_blank');
+      showToast(`Exporting leads (${format.toUpperCase()})...`, 'info');
+    } catch (err) {
+      showToast('Export failed', 'error');
+    }
+  };
+
+  const handleFileImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      showToast('Processing lead import...', 'info');
+      const report = await crmApi.importLeads(file, false, false);
+      await refreshData();
+      showToast(`Import completed: ${report.inserted} inserted, ${report.skippedDuplicates} duplicates skipped, ${report.rejectedErrors} rejected.`, 'success');
+    } catch (err) {
+      showToast(err.message || 'Import failed', 'error');
+    } finally {
+      if (e.target) e.target.value = '';
+    }
   };
 
   const hasActiveFilters = searchTerm || selectedStage !== 'All' || selectedPriority !== 'All' || selectedSource !== 'All' || selectedEmployee !== 'All';
@@ -143,7 +178,34 @@ export const LeadsPage = () => {
           </p>
         </div>
 
-        <div className="page-actions">
+        <div className="page-actions" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".csv, .xlsx"
+            onChange={handleFileImport}
+          />
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => fileInputRef.current?.click()}
+            title="Import leads from CSV or Excel file"
+          >
+            <Upload size={15} />
+            <span>Import</span>
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => handleExport('csv')}
+            title="Export filtered leads to CSV"
+          >
+            <Download size={15} />
+            <span>Export CSV</span>
+          </button>
+
           <button
             type="button"
             className="btn btn-primary"

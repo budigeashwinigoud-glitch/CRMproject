@@ -1,0 +1,96 @@
+def test_list_leads_returns_seeded_data(client):
+    res = client.get("/api/leads")
+    assert res.status_code == 200
+    leads = res.json()
+    assert len(leads) >= 10
+    first_lead = leads[0]
+    assert "id" in first_lead
+    assert "fullName" in first_lead
+    assert "company" in first_lead
+    assert "pipelineStage" in first_lead
+
+
+def test_create_lead_full_lifecycle(client):
+    payload = {
+        "fullName": "Rodrigo Silva",
+        "company": "Banco Inter Brasil",
+        "email": "rodrigo.silva@bancointer.com.br",
+        "phone": "+55 31 98877-6655",
+        "leadSource": "Referral",
+        "leadCategory": "Digital Banking",
+        "priority": "High",
+        "pipelineStage": "Qualified",
+        "assignedEmployee": "Ashwini Sharma",
+        "expectedValue": 95000,
+        "notes": "Looking to integrate automated income verification.",
+        "nextFollowUpDate": "2026-10-28",
+        "website": "https://bancointer.com.br",
+        "location": "Belo Horizonte, Brazil"
+    }
+    res = client.post("/api/leads", json=payload)
+    assert res.status_code == 201
+    created = res.json()
+    lead_id = created["id"]
+    assert lead_id.startswith("LEAD-")
+    assert created["company"] == "Banco Inter Brasil"
+    assert created["expectedValue"] == 95000
+
+    # Verify lead can be fetched directly
+    get_res = client.get(f"/api/leads/{lead_id}")
+    assert get_res.status_code == 200
+    assert get_res.json()["email"] == "rodrigo.silva@bancointer.com.br"
+
+    # Verify stage transition
+    patch_stage_res = client.patch(f"/api/leads/{lead_id}/stage", json={"stage": "Proposal"})
+    assert patch_stage_res.status_code == 200
+    assert patch_stage_res.json()["pipelineStage"] == "Proposal"
+
+    # Verify assignment change
+    patch_assign_res = client.patch(
+        f"/api/leads/{lead_id}/assignment",
+        json={"assignedEmployee": "Carlos Mendes"}
+    )
+    assert patch_assign_res.status_code == 200
+    assert patch_assign_res.json()["assignedEmployee"] == "Carlos Mendes"
+
+    # Verify activity was automatically logged
+    act_res = client.get(f"/api/leads/{lead_id}/activities")
+    assert act_res.status_code == 200
+    acts = act_res.json()
+    assert len(acts) >= 2  # creation, stage transition, reassignment
+
+    # Verify archive and restore
+    arch_res = client.post(f"/api/leads/{lead_id}/archive")
+    assert arch_res.status_code == 200
+    assert arch_res.json()["isArchived"] is True
+
+    # Leads list should exclude archived by default
+    active_res = client.get("/api/leads")
+    active_ids = [l["id"] for l in active_res.json()]
+    assert lead_id not in active_ids
+
+    # Restore lead
+    rest_res = client.post(f"/api/leads/{lead_id}/restore")
+    assert rest_res.status_code == 200
+    assert rest_res.json()["isArchived"] is False
+
+
+def test_lead_search_and_filters(client):
+    # Search by company
+    res = client.get("/api/leads?search=Nubank")
+    assert res.status_code == 200
+    results = res.json()
+    assert len(results) >= 1
+    assert any("Nubank" in l["company"] for l in results)
+
+    # Filter by stage
+    res_stage = client.get("/api/leads?stage=Won")
+    assert res_stage.status_code == 200
+    won_leads = res_stage.json()
+    assert all(l["pipelineStage"] == "Won" for l in won_leads)
+
+    # Filter by priority
+    res_pri = client.get("/api/leads?priority=High")
+    assert res_pri.status_code == 200
+    high_leads = res_pri.json()
+    assert all(l["priority"] == "High" for l in high_leads)

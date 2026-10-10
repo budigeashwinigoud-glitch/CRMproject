@@ -15,7 +15,7 @@ import {
 import { useCRM } from '../../context/CRMContext';
 
 export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
-  const { metrics, resetDemoData } = useCRM();
+  const { metrics, resetDemoData, backendConnected } = useCRM();
 
   const navItems = [
     {
@@ -238,13 +238,13 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 style={{
                   fontSize: '0.7rem',
                   fontWeight: 700,
-                  color: '#10b981',
-                  backgroundColor: 'rgba(16,185,129,0.1)',
+                  color: backendConnected ? '#38bdf8' : '#10b981',
+                  backgroundColor: backendConnected ? 'rgba(56,189,248,0.1)' : 'rgba(16,185,129,0.1)',
                   padding: '2px 6px',
                   borderRadius: 4
                 }}
               >
-                Demo Active
+                {backendConnected ? "Live Backend" : "Demo Active"}
               </span>
             </div>
             <button
