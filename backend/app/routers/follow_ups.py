@@ -114,14 +114,25 @@ def create_follow_up(
     return FollowUpResponse.from_orm_model(fu)
 
 
+def check_follow_up_access(fu: FollowUp, current_user: Optional[User]):
+    if current_user and current_user.role.upper() == "EMPLOYEE":
+        if fu.assigned_employee != current_user.full_name and fu.assigned_user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access forbidden: This follow-up is assigned to another team specialist."
+            )
+
+
 @router.get("/{follow_up_id}", response_model=FollowUpResponse)
 def get_follow_up(
     follow_up_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
         raise HTTPException(status_code=404, detail="Follow-up not found")
+    check_follow_up_access(fu, current_user)
     return FollowUpResponse.from_orm_model(fu)
 
 
@@ -135,6 +146,8 @@ def update_follow_up(
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
         raise HTTPException(status_code=404, detail="Follow-up not found")
+
+    check_follow_up_access(fu, current_user)
 
     if fu_in.title is not None:
         fu.title = fu_in.title
@@ -172,6 +185,8 @@ def update_follow_up_status(
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
         raise HTTPException(status_code=404, detail="Follow-up not found")
+
+    check_follow_up_access(fu, current_user)
 
     fu.status = body.status
     if body.status == "Completed":
@@ -214,12 +229,14 @@ def complete_follow_up(
 @router.delete("/{follow_up_id}", status_code=status.HTTP_200_OK)
 def delete_follow_up(
     follow_up_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
         raise HTTPException(status_code=404, detail="Follow-up not found")
 
+    check_follow_up_access(fu, current_user)
     db.delete(fu)
     db.commit()
     return {"success": True, "message": f"Follow-up {follow_up_id} removed."}

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.database import engine, Base, SessionLocal
 from app.seed import seed_database
-from app.routers import auth, users, leads, pipeline, follow_ups, activities, dashboard, data_io
+from app.routers import auth, users, leads, pipeline, follow_ups, activities, dashboard, data_io, integrations, ai
 
 
 @asynccontextmanager
@@ -58,6 +58,8 @@ app.include_router(follow_ups.router, prefix="/api")
 app.include_router(activities.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(data_io.router, prefix="/api")
+app.include_router(integrations.router, prefix="/api")
+app.include_router(ai.router, prefix="/api")
 
 
 if __name__ == "__main__":

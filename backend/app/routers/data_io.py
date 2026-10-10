@@ -82,7 +82,7 @@ def export_leads(
 ):
     query = db.query(Lead).filter(Lead.is_archived == False)
 
-    if current_user and current_user.role.upper() == "EMPLOYEE" and not employee:
+    if current_user and current_user.role.upper() == "EMPLOYEE":
         query = query.filter(Lead.assigned_employee == current_user.full_name)
     elif employee and employee != "All":
         query = query.filter(Lead.assigned_employee == employee)

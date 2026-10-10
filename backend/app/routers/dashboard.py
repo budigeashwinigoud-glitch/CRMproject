@@ -25,7 +25,7 @@ def get_metrics(
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     filter_emp = employee
-    if current_user and current_user.role.upper() == "EMPLOYEE" and not employee:
+    if current_user and current_user.role.upper() == "EMPLOYEE":
         filter_emp = current_user.full_name
 
     return calculate_dashboard_metrics(db, employee=filter_emp)
@@ -37,23 +37,35 @@ def get_emp_metrics(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    target_emp = employee or (current_user.full_name if current_user else "Ashwini Sharma")
+    if current_user and current_user.role.upper() == "EMPLOYEE":
+        target_emp = current_user.full_name
+    else:
+        target_emp = employee or (current_user.full_name if current_user else "Ashwini Sharma")
+
     return calculate_employee_metrics(db, employee=target_emp)
 
 
 @router.get("/pipeline", response_model=List[StageBreakdownItem])
 def get_pipeline_metrics(
     employee: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    metrics = calculate_dashboard_metrics(db, employee=employee)
+    filter_emp = employee
+    if current_user and current_user.role.upper() == "EMPLOYEE":
+        filter_emp = current_user.full_name
+    metrics = calculate_dashboard_metrics(db, employee=filter_emp)
     return metrics.stageBreakdown
 
 
 @router.get("/lead-sources", response_model=List[SourceBreakdownItem])
 def get_lead_sources(
     employee: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    metrics = calculate_dashboard_metrics(db, employee=employee)
+    filter_emp = employee
+    if current_user and current_user.role.upper() == "EMPLOYEE":
+        filter_emp = current_user.full_name
+    metrics = calculate_dashboard_metrics(db, employee=filter_emp)
     return metrics.sourceBreakdown

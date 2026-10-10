@@ -97,6 +97,15 @@ def check_duplicates(
     )
 
 
+def check_lead_access(lead: Lead, current_user: Optional[User]):
+    if current_user and current_user.role.upper() == "EMPLOYEE":
+        if lead.assigned_employee != current_user.full_name and lead.assigned_user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access forbidden: This lead is assigned to another team specialist."
+            )
+
+
 @router.get("/{lead_id}", response_model=LeadResponse)
 def get_lead(
     lead_id: str,
@@ -107,13 +116,7 @@ def get_lead(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
-    if current_user and current_user.role.upper() == "EMPLOYEE":
-        if lead.assigned_employee != current_user.full_name and lead.assigned_user_id != current_user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access forbidden: This lead is assigned to another team specialist."
-            )
-
+    check_lead_access(lead, current_user)
     return LeadResponse.from_orm_model(lead)
 
 
@@ -128,6 +131,7 @@ def update_lead_full(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else (lead.assigned_employee or "Ashwini Sharma")
     updated = update_lead(db, lead, lead_in, performed_by=performer)
     return LeadResponse.from_orm_model(updated)
@@ -144,6 +148,7 @@ def update_lead_partial(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else (lead.assigned_employee or "Ashwini Sharma")
     updated = update_lead(db, lead, lead_in, performed_by=performer)
     return LeadResponse.from_orm_model(updated)
@@ -159,6 +164,7 @@ def delete_lead(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else "Ashwini Sharma"
     archive_lead(db, lead, performed_by=performer)
     return {"success": True, "message": f"Lead {lead_id} archived successfully."}
@@ -174,6 +180,7 @@ def archive_lead_endpoint(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else "Ashwini Sharma"
     archived = archive_lead(db, lead, performed_by=performer)
     return LeadResponse.from_orm_model(archived)
@@ -189,6 +196,7 @@ def restore_lead_endpoint(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else "Ashwini Sharma"
     restored = restore_lead(db, lead, performed_by=performer)
     return LeadResponse.from_orm_model(restored)
@@ -205,6 +213,7 @@ def change_lead_stage(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else (lead.assigned_employee or "Ashwini Sharma")
     updated = update_lead_stage(db, lead, body.stage, performed_by=performer)
     return LeadResponse.from_orm_model(updated)
@@ -221,6 +230,7 @@ def change_lead_assignment(
     if not lead:
         raise HTTPException(status_code=404, detail=f"Lead {lead_id} not found")
 
+    check_lead_access(lead, current_user)
     prev_emp = lead.assigned_employee
     lead.assigned_employee = body.assigned_employee
     if body.assigned_user_id is not None:
@@ -245,7 +255,14 @@ def change_lead_assignment(
 
 
 @router.get("/{lead_id}/activities", response_model=List[ActivityResponse])
-def get_lead_activities(lead_id: str, db: Session = Depends(get_db)):
+def get_lead_activities(
+    lead_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if lead:
+        check_lead_access(lead, current_user)
     acts = db.query(Activity).filter(Activity.lead_id == lead_id).order_by(Activity.created_at.desc()).all()
     return [ActivityResponse.from_orm_model(a) for a in acts]
 
@@ -258,6 +275,8 @@ def add_lead_activity(
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if lead:
+        check_lead_access(lead, current_user)
     performer = current_user.full_name if current_user else (act_in.performed_by or "Ashwini Sharma")
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
     act = Activity(
@@ -277,7 +296,14 @@ def add_lead_activity(
 
 
 @router.get("/{lead_id}/notes", response_model=List[NoteResponse])
-def get_lead_notes(lead_id: str, db: Session = Depends(get_db)):
+def get_lead_notes(
+    lead_id: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if lead:
+        check_lead_access(lead, current_user)
     notes = db.query(Note).filter(Note.lead_id == lead_id).order_by(Note.created_at.desc()).all()
     return [NoteResponse.from_orm_model(n) for n in notes]
 
@@ -289,6 +315,9 @@ def add_lead_note(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
+    lead = db.query(Lead).filter(Lead.id == lead_id).first()
+    if lead:
+        check_lead_access(lead, current_user)
     author = current_user.full_name if current_user else (note_in.author_name or "Ashwini Sharma")
     author_id = current_user.id if current_user else None
     note = Note(
