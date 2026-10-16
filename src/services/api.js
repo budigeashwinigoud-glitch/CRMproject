@@ -172,7 +172,7 @@ export const crmApi = {
     });
   },
 
-  updateFollowUpStatus: async (id, status) => {
+  updateFollowupStatus: async (id, status) => {
     return request(`/follow-ups/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status })
@@ -224,5 +224,6 @@ export const crmApi = {
     return `${API_BASE_URL}/export/leads?${query}`;
   }
 };
+
 
 export default crmApi;

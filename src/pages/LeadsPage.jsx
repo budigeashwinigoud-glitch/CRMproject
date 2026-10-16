@@ -205,6 +205,15 @@ export const LeadsPage = () => {
             <Download size={15} />
             <span>Export CSV</span>
           </button>
+          <button
+  type="button"
+  className="btn btn-secondary"
+  onClick={() => handleExport('xlsx')}
+  title="Export leads to Excel"
+>
+  <Download size={15} />
+  <span>Export Excel</span>
+</button>
 
           <button
             type="button"

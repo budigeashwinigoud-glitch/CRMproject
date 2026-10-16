@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import crmApi from '../../services/api';
 import {
   Search,
   Plus,
   Bell,
   CheckCircle2,
   Menu,
-  ShieldCheck
-} from 'lucide-react';
+  ShieldCheck,
+  LogOut
+} 
+from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
 export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
   const navigate = useNavigate();
-  const { followUps, backendConnected } = useCRM();
+  const { followUps, backendConnected,setCurrentUser,currentUser } = useCRM();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const handleLogout = () => {
+  crmApi.logout();
+  setCurrentUser(null);
+  navigate('/login', { replace: true });
+};
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -194,6 +202,18 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             </div>
           )}
         </div>
+        {/* Logout Button */}
+<button
+  type="button"
+  className="btn btn-secondary btn-sm"
+  onClick={handleLogout}
+  title="Logout"
+>
+  <LogOut size={16} />
+  <span>Logout</span>
+</button>
+
+
 
         {/* User Profile */}
         <div
@@ -219,14 +239,21 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
               fontSize: '0.8rem'
             }}
           >
-            AS
+            {(currentUser?.fullName || currentUser?.name || currentUser?.email || 'User')
+            .trim()
+  .split(/\s+/)
+  .map(part => part[0])
+  .slice(0,2)
+  .join('')
+  
+  .toUpperCase()}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
-              Ashwini Sharma
+              {currentUser?.fullName || currentUser?.name || currentUser?.email || 'User'}
             </span>
             <span style={{ fontSize: '0.7rem', color: '#64748b', lineHeight: 1.2 }}>
-              Lead CRM Specialist
+              {currentUser?.role || 'Employee'}
             </span>
           </div>
         </div>
