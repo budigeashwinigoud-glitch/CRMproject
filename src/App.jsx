@@ -9,6 +9,8 @@ import ClientsPage from './pages/ClientsPage';
 import FollowUpsPage from './pages/FollowUpsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import LeadDetailPage from './pages/LeadDetailPage';
+import ArchivedLeadsPage from './pages/ArchivedLeadsPage';
+import UserManagementPage from './pages/UserManagementPage';
 
 function App() {
   return (
@@ -23,6 +25,9 @@ function App() {
             <Route path="clients" element={<ClientsPage />} />
             <Route path="follow-ups" element={<FollowUpsPage />} />
             <Route path="activities" element={<ActivitiesPage />} />
+            <Route path="archived-leads" element={<ArchivedLeadsPage />} />
+            <Route path="users" element={<UserManagementPage />} />
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

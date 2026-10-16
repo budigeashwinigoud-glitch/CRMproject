@@ -21,7 +21,8 @@ export const ClientsPage = () => {
   const [selectedLead, setSelectedLead] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const filteredClients = useMemo(() => {
     return leads.filter(lead => {
       const searchLower = searchTerm.toLowerCase();
@@ -34,7 +35,20 @@ export const ClientsPage = () => {
       );
     });
   }, [leads, searchTerm]);
+  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
 
+const paginatedClients = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  return filteredClients.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+}, [filteredClients, currentPage]);
+
+React.useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm]);
   return (
     <div>
       {/* Page Header */}
@@ -106,7 +120,7 @@ export const ClientsPage = () => {
         />
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 18 }}>
-          {filteredClients.map(client => (
+          {paginatedClients.map(client => (
             <div
               key={client.id}
               className="crm-card"
@@ -216,7 +230,48 @@ export const ClientsPage = () => {
           ))}
         </div>
       )}
+{filteredClients.length > 0 && (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 12,
+      padding: '16px 4px',
+      flexWrap: 'wrap'
+    }}
+  >
+    <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+      Showing {(currentPage - 1) * itemsPerPage + 1}–
+      {Math.min(currentPage * itemsPerPage, filteredClients.length)}
+      {' '}of {filteredClients.length} clients
+    </span>
 
+    <div style={{ display: 'flex', gap: 8 }}>
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(page => page - 1)}
+      >
+        Previous
+      </button>
+
+      <span style={{ alignSelf: 'center', fontSize: '0.875rem' }}>
+        Page {currentPage} of {Math.max(totalPages, 1)}
+      </span>
+
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage >= totalPages}
+        onClick={() => setCurrentPage(page => page + 1)}
+      >
+        Next
+      </button>
+    </div>
+  </div>
+)}
       {/* Lead Detail Modal */}
       <LeadDetailModal
         isOpen={Boolean(selectedLead)}

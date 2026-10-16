@@ -85,6 +85,8 @@ export const crmApi = {
     const query = new URLSearchParams(params).toString();
     return request(`/leads${query ? `?${query}` : ''}`);
   },
+  getArchivedLeads: async () => crmApi.getLeads({ include_archived: true }),
+
 
   getLeadById: async (id) => {
     return request(`/leads/${id}`);
@@ -208,6 +210,25 @@ export const crmApi = {
       body: JSON.stringify(noteData)
     });
   },
+    // User Management
+  getUsers: async () => {
+    return request('/users');
+  },
+
+  createUser: async (userData) => {
+    return request('/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
+
+  updateUserStatus: async (id, isActive) => {
+    return request(`/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: isActive })
+    });
+  },
+
 
   // CSV & Excel Import / Export
   importLeads: async (file, dryRun = false, updateDuplicates = false) => {
