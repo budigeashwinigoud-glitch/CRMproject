@@ -9,12 +9,21 @@ import ClientsPage from './pages/ClientsPage';
 import FollowUpsPage from './pages/FollowUpsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import LeadDetailPage from './pages/LeadDetailPage';
+import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   return (
     <CRMProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          
+
+<Route element={<ProtectedRoute />}>
+  
+          
+
           <Route path="/" element={<Layout />}>
             <Route index element={<DashboardPage />} />
             <Route path="leads" element={<LeadsPage />} />
@@ -24,6 +33,7 @@ function App() {
             <Route path="follow-ups" element={<FollowUpsPage />} />
             <Route path="activities" element={<ActivitiesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
           </Route>
         </Routes>
       </BrowserRouter>

@@ -186,7 +186,7 @@ export const CRMProvider = ({ children }) => {
     try {
       let updated;
       if (backendConnected) {
-        updated = await crmApi.updateFollowUpStatus(id, status);
+        updated = await crmApi.updateFollowupStatus(id, status);
       } else {
         updated = dataService.updateFollowUpStatus(id, status);
       }
