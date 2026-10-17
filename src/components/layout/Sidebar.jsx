@@ -7,10 +7,12 @@ import {
   Building2,
   CalendarCheck,
   Activity,
+  Archive,
   RotateCcw,
   Sparkles,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  UserCog
 } from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
@@ -50,7 +52,18 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       label: 'Activities',
       path: '/activities',
       icon: Activity
-    }
+    },
+    {
+      label: 'Archived Leads',
+      path: '/archived-leads',
+      icon: Archive
+    },
+    {
+      label: 'User Management',
+      path: '/users',
+      icon: UserCog
+   }
+
   ];
 
   return (

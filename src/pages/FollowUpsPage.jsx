@@ -26,6 +26,8 @@ export const FollowUpsPage = () => {
   const [activeTab, setActiveTab] = useState('All'); // 'All' | 'Overdue' | 'Today' | 'Upcoming' | 'Completed'
   const [selectedType, setSelectedType] = useState('All');
   const [selectedAssignee, setSelectedAssignee] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [inspectingLead, setInspectingLead] = useState(null);
@@ -70,6 +72,21 @@ export const FollowUpsPage = () => {
       return a.dueDate.localeCompare(b.dueDate);
     });
   }, [followUps, activeTab, selectedType, selectedAssignee, today]);
+  const totalPages = Math.ceil(filteredFollowUps.length / itemsPerPage);
+
+const paginatedFollowUps = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  return filteredFollowUps.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+}, [filteredFollowUps, currentPage]);
+React.useEffect(() => {
+  setCurrentPage(1);
+}, [activeTab, selectedType, selectedAssignee]);
+
+
 
   const handleCreateFollowUp = (e) => {
     e.preventDefault();
@@ -248,7 +265,9 @@ export const FollowUpsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredFollowUps.map(item => {
+              
+                {paginatedFollowUps.map(item => {
+
                   const isCompleted = item.status === 'Completed';
                   const isOverdue = !isCompleted && (item.status === 'Overdue' || item.dueDate < today);
                   const matchedLead = leads.find(l => String(l.id) === String(item.leadId));
@@ -370,8 +389,52 @@ export const FollowUpsPage = () => {
           </div>
         )}
       </div>
+{filteredFollowUps.length > 0 && (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 12,
+      padding: '16px 4px',
+      flexWrap: 'wrap'
+    }}
+  >
+    <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+      Showing {(currentPage - 1) * itemsPerPage + 1}–
+      {Math.min(currentPage * itemsPerPage, filteredFollowUps.length)}
+      {' '}of {filteredFollowUps.length} follow-ups
+    </span>
+
+    <div style={{ display: 'flex', gap: 8 }}>
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(page => page - 1)}
+      >
+        Previous
+      </button>
+
+      <span style={{ alignSelf: 'center', fontSize: '0.875rem' }}>
+        Page {currentPage} of {Math.max(totalPages, 1)}
+      </span>
+
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage >= totalPages}
+        onClick={() => setCurrentPage(page => page + 1)}
+      >
+        Next
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* Schedule Follow-up Modal */}
+      
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}

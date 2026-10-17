@@ -20,6 +20,8 @@ export const ActivitiesPage = () => {
   const [selectedType, setSelectedType] = useState('All');
   const [selectedPerformer, setSelectedPerformer] = useState('All');
   const [inspectingLead, setInspectingLead] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const filteredActivities = useMemo(() => {
     return activities.filter(act => {
@@ -36,6 +38,20 @@ export const ActivitiesPage = () => {
       return matchesSearch && matchesType && matchesPerformer;
     });
   }, [activities, searchTerm, selectedType, selectedPerformer]);
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+
+const paginatedActivities = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  return filteredActivities.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+}, [filteredActivities, currentPage]);
+React.useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, selectedType, selectedPerformer]);
+
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -144,7 +160,7 @@ export const ActivitiesPage = () => {
         ) : (
           <div style={{ padding: 20 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {filteredActivities.map(item => {
+              {paginatedActivities.map(item => {
                 const matchedLead = leads.find(l => String(l.id) === String(item.leadId));
 
                 return (
@@ -216,6 +232,50 @@ export const ActivitiesPage = () => {
           </div>
         )}
       </div>
+{filteredActivities.length > 0 && (
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 12,
+      padding: '16px 4px',
+      flexWrap: 'wrap'
+    }}
+  >
+    <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
+      Showing {(currentPage - 1) * itemsPerPage + 1}–
+      {Math.min(currentPage * itemsPerPage, filteredActivities.length)}
+      {' '}of {filteredActivities.length} activities
+    </span>
+
+    <div style={{ display: 'flex', gap: 8 }}>
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage(page => page - 1)}
+      >
+        Previous
+      </button>
+
+      <span style={{ alignSelf: 'center', fontSize: '0.875rem' }}>
+        Page {currentPage} of {Math.max(totalPages, 1)}
+      </span>
+
+      <button
+        type="button"
+        className="btn btn-secondary btn-sm"
+        disabled={currentPage >= totalPages}
+        onClick={() => setCurrentPage(page => page + 1)}
+      >
+        Next
+      </button>
+    </div>
+  </div>
+)}
+
+
 
       {/* Inspect Lead Profile */}
       <LeadDetailModal
