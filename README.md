@@ -235,9 +235,9 @@ python -m pytest -v
 
 ---
 
-## 📊 Project Completion & Status Tracking
+## 📊 Project Roadmap, Deliverables & Testing Status
 
-### 🎯 Overall Status: ~85% Complete (Ahead of Schedule)
+### 🎯 Overall Status: ~85% Complete (Ahead of Schedule for Week 2 Review)
 
 | Milestone & Module | Status | Deliverables Completed | Pending / Next Steps |
 | :--- | :---: | :--- | :--- |
@@ -248,11 +248,19 @@ python -m pytest -v
 
 ---
 
-### 🔍 Detailed Checklist: What is Done vs. What is Pending
+### 🔍 Status Breakdown: What is Done, What Needs to be Built, and What Needs to be Verified / Tested
 
-#### 1. What is Completed (Verified & Operational)
+```
+┌────────────────────────┬────────────────────────┬────────────────────────┐
+│      1. WHAT IS        │     2. WHAT NEEDS      │     3. WHAT NEEDS      │
+│         DONE           │      TO BE BUILT       │   TO BE TESTED /       │
+│  (Verified & Working)  │  (Remaining Modules)   │      VERIFIED          │
+└────────────────────────┴────────────────────────┴────────────────────────┘
+```
+
+#### 1. What is Done (Built, Integrated & Operational)
 - **Core Architecture & Persistence**:
-  - Full relational schema (users, leads, pipeline stages, follow-ups, activities, notes) with Alembic migration version control.
+  - Relational schema (users, leads, pipeline stages, follow-ups, activities, notes) with Alembic migration version control.
   - Zero mock data startup guarantee: Clean database with zero fake demo records on boot.
   - Cloud PostgreSQL compatibility: `psycopg2-binary` driver and `postgres://` URL normalization ready for Supabase/Neon/Render.
 - **Authentication, Security & Roles**:
@@ -278,23 +286,44 @@ python -m pytest -v
 - **Integrations & AI Architecture**:
   - Webhook security: HMAC-SHA256 signature validation with persistent crash-resilient event deduplication.
   - AI backend endpoints: Lead scoring, conversion probability, NLP summaries, next-best action, AI message drafting, and Daily Manager.
-- **Testing & Verification**:
+- **Automated Test Suites**:
   - 46 backend pytest tests passing (100%).
   - 26 frontend functional tests passing (100%).
   - Clean Vite production build in < 1 second.
 
-#### 2. What Needs to be Done (Pending Tasks)
-- **Third-Party API Credentials & Live Handshakes**:
-  - Meta Developer App ID & App Secret for live Facebook/Instagram Lead Ads webhook subscriptions.
-  - WhatsApp Cloud API permanent system access token & Phone Number ID for live messaging.
-  - Google Cloud Console OAuth 2.0 Client ID / Secret for live Google Calendar & Gmail synchronization.
-- **Cloud Database Provisioning**:
-  - Setting the production cloud PostgreSQL database connection string (`DATABASE_URL`).
-- **AI/ML Model Fine-Tuning**:
-  - Connecting custom trained ML models (e.g. Scikit-learn / XGBoost lead scoring model) or live Gemini/OpenAI API prompts to replace heuristic fallbacks in `backend/app/services/ai_service.py`.
-- **Final Deployment & Demo Preparation**:
-  - Deploy frontend to Vercel/Netlify and backend to Render/Fly.io.
-  - Prepare final project slides and demo for November 3, 2026, 6:00 PM IST submission.
+---
+
+#### 2. What Needs to be Built (Remaining Scope)
+- **Custom Trained ML Inference Models (AI/ML Module)**:
+  - Connect custom-trained classification models (e.g. Scikit-learn / XGBoost lead scoring model) to replace the heuristic fallbacks in `backend/app/services/ai_service.py`.
+  - Connect live Google Gemini API or OpenAI API keys for generative natural language response drafting.
+- **Live Provider Handshake Pipelines (Integrations Module)**:
+  - Plug in Meta Developer App ID and App Secret (`META_APP_SECRET`) for live Facebook/Instagram Lead Ads webhook subscriptions.
+  - Plug in WhatsApp Cloud API permanent system access token & Phone Number ID for live two-way messaging.
+  - Implement live Google Workspace & Microsoft Graph OAuth 2.0 token exchange routes for calendar meetings and email sync (upgrading from the current `CONFIRMED_LOCAL` local adapter).
+- **Cloud Hosting & Production Deployment Setup**:
+  - Create Render / Fly.io web service configuration for the FastAPI backend.
+  - Create Vercel / Netlify static hosting configuration for the React frontend.
+  - Provision a production cloud PostgreSQL database on Supabase or Neon.
+
+---
+
+#### 3. What Needs to be Verified / Tested (QA & Pre-Submission Checklist)
+- **Live Third-Party Webhook Testing**:
+  - Test Meta Lead Ads webhook with real Facebook Graph API test payloads and verify HMAC-SHA256 signature calculation against live credentials.
+  - Test WhatsApp webhook verification handshake (`hub.challenge` and `hub.verify_token`) with live Meta Developer portal.
+- **Cloud Database Load & Persistence Verification**:
+  - Execute live Alembic migrations against the production PostgreSQL instance (`alembic upgrade head`).
+  - Verify concurrent read/write transactions under multi-user access.
+- **End-to-End User Acceptance Testing (UAT)**:
+  - Multi-user browser testing: Verify simultaneously logging in as Admin (`admin@belvo.com`) in one browser window and Employee (`ashwini@belvo.com`) in an incognito window to verify real-time data isolation.
+  - Test large spreadsheet uploads (1,000+ rows) via CSV/Excel bulk import to verify memory and timeout thresholds.
+  - Verify exported CSV/Excel files open safely in Microsoft Excel and Google Sheets without formula injection security warnings.
+- **Mobile & Cross-Browser Responsiveness**:
+  - Verify the Kanban board and dashboard layout render cleanly on tablet and mobile viewports.
+- **Final Security & Penetration Audit**:
+  - Verify that running with `ENVIRONMENT=production` rejects any insecure or default `JWT_SECRET`.
+  - Confirm CORS headers only allow verified frontend production domains.
 
 ### 2. Frontend Test Suite
 ```bash
