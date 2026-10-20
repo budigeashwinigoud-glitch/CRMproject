@@ -233,17 +233,6 @@ python -m pytest -v
 
 ---
 
-## 👥 Team Ownership, Contributors & Deliverable Matrix
-
-| Contributor / Member | Primary Ownership & Modules | Deliverables Completed (What is Done) | Pending Responsibilities (What Needs to be Done) |
-| :--- | :--- | :--- | :--- |
-| **Atchyuta Pavan Karthikeya** (`pavan`) | **Backend Architecture, Database, REST APIs, Security, Auth & Tests** | • Complete SQLAlchemy ORM models & Alembic migrations<br>• JWT Authentication & bcrypt hashing<br>• RBAC with strict Employee data isolation<br>• Full CRUD APIs for Leads, Tasks, Notes, Activities<br>• Dashboard metrics & analytics engines<br>• CSV/Excel import/export with formula injection defense<br>• Webhook security (HMAC-SHA256 & persistent deduplication)<br>• AI backend contracts (`score`, `summary`, `daily-manager`)<br>• 46 pytest automated tests passing (100%)<br>• Clean zero-mock database startup guarantee | • Maintain backend uptime & assist teammates during integration<br>• Assist with cloud database migrations upon deployment |
-| **B. Ashwini** (`budigeashwini`) | **Core Frontend, UX Architecture, Dashboard & Pipeline** | • Core React 19 UI component library & layout<br>• Interactive Kanban sales pipeline with drag-and-drop<br>• Executive Dashboard layout & live metric cards<br>• Leads management view with multi-column filtering/search<br>• Centralized client profiles & activity timeline view<br>• Project documentation & styling architecture | • Review UI responsiveness across mobile views<br>• Assist in final presentation/demo preparation |
-| **Samsthutha R** (`rsamsthutha`) | **Authentication UI, Route Protection & Excel Export** | • `/login` page with secure JWT & user session handling<br>• `ProtectedRoute.jsx` component gating authenticated routes<br>• Dynamic header profile with role avatar & logout trigger<br>• Frontend Excel (`.xlsx`) export trigger integration | • Assist with final end-to-end user acceptance testing |
-| **Niheetha Saggam** (`Niheethasaggam`) | **User Management, Archived Leads & Pagination** | • `/users` page for viewing, creating, & deactivating accounts<br>• `/archived-leads` page with instant lead restoration<br>• Client-side pagination across Activities and Clients tables<br>• Dynamic search-reset hooks for page pagination | • Verify admin privilege prompts across user operations |
-| **Thrija** | **AI / ML Engineering & Predictive Models** | • AI architecture planning & prompt engineering specifications<br>• Collaboration with backend on decoupled scoring contracts | • Plug in custom-trained ML models (Scikit-learn/XGBoost) or live LLM API keys (Gemini/OpenAI) into `backend/app/services/ai_service.py`<br>• Calibrate conversion probability predictions with LatAm fintech feature weights |
-| **New Team Members** | **Live Integrations & Cloud Infrastructure** | • Initial onboarding & repository review | • Add live API keys for Meta Lead Ads (`META_APP_SECRET`) & WhatsApp Cloud API (`WHATSAPP_VERIFY_TOKEN`)<br>• Configure OAuth2 client ID/secret for Google Calendar & Gmail/Outlook sync<br>• Set up cloud PostgreSQL database URL (Supabase/Neon/Render) |
-
 ---
 
 ## 📊 Project Completion & Status Tracking
@@ -254,41 +243,56 @@ python -m pytest -v
 | :--- | :---: | :--- | :--- |
 | **Week 1: CRM Foundation** (7–13 Oct) | **100% DONE** | User authentication (JWT + bcrypt), Admin & Employee roles, Lead CRUD, search, multi-filter, prioritization, notes, configurable 8-stage pipeline (`New` $\rightarrow$ `Won`/`Lost`), database schema & Alembic migrations. | None (Fully complete). |
 | **Week 2: Sales Pipeline & Follow-Ups** (14–20 Oct) | **100% DONE** | Kanban board with drag-and-drop stage movement, task scheduling (Today / Upcoming / Overdue), centralized client profiles, activity audit trail, table pagination, and strict employee data isolation. | None (Fully complete). |
-| **Week 3: Dashboards & Data Management** (21–27 Oct) | **90% DONE** | Executive & Employee dashboard metrics, CSV & Excel import/export with formula injection defense, multi-factor duplicate detection, webhook architecture (Meta HMAC-SHA256, WhatsApp). | Connection of live third-party API credentials (Meta, WhatsApp, Google OAuth) by new team members. |
-| **Week 4: AI/ML, Testing & Deployment** (28 Oct–3 Nov) | **50% DONE** | **Backend contracts (100% Done by Pavan)**: REST endpoints for AI Lead Scoring (`Hot`/`Warm`/`Cold`), conversion probability, summaries, next-best action, AI message drafts, daily manager. Decoupled DB columns. 46 backend tests, 26 frontend tests, Vite build verified. | Custom ML model training / LLM fine-tuning weights by Thrija; live cloud hosting setup by team. |
+| **Week 3: Dashboards & Data Management** (21–27 Oct) | **90% DONE** | Executive & Employee dashboard metrics, CSV & Excel import/export with formula injection defense, multi-factor duplicate detection, webhook architecture (Meta HMAC-SHA256, WhatsApp). | Connection of live third-party API credentials (Meta, WhatsApp, Google OAuth). |
+| **Week 4: AI/ML, Testing & Deployment** (28 Oct–3 Nov) | **50% DONE** | REST endpoints for AI Lead Scoring (`Hot`/`Warm`/`Cold`), conversion probability, summaries, next-best action, AI message drafts, daily manager. Decoupled DB columns. 46 backend tests, 26 frontend tests, Vite build verified. | Custom ML model training / LLM fine-tuning weights; live cloud hosting setup. |
 
 ---
 
-### 🔍 Summary Checklist: What is Done vs. What is Pending
+### 🔍 Detailed Checklist: What is Done vs. What is Pending
 
 #### 1. What is Completed (Verified & Operational)
-- **Backend Architecture & APIs (Pavan)**:
-  - All REST endpoints for Leads, Pipelines, Tasks, Activities, Notes, Users, and Dashboards.
-  - Role-based authorization: Employees cannot access other employees' records or administrative settings.
+- **Core Architecture & Persistence**:
+  - Full relational schema (users, leads, pipeline stages, follow-ups, activities, notes) with Alembic migration version control.
   - Zero mock data startup guarantee: Clean database with zero fake demo records on boot.
-  - Production security validation: Settings validator prevents default or weak JWT secrets in production.
   - Cloud PostgreSQL compatibility: `psycopg2-binary` driver and `postgres://` URL normalization ready for Supabase/Neon/Render.
-  - Webhook security: HMAC-SHA256 signature validation with persistent SQLite/PostgreSQL deduplication.
-  - All 46 pytest tests passing.
-- **Frontend Core & User Experience (Ashwini, Samsthutha, Niheetha)**:
-  - Responsive React 19 UI with clean layout and sidebar navigation.
-  - Real-time Dashboard, Kanban Pipeline, Leads Table, Clients, and Follow-ups views.
-  - `/login` page with secure token management and `ProtectedRoute` redirection.
+- **Authentication, Security & Roles**:
+  - JWT Bearer authentication with bcrypt password hashing.
+  - Dedicated `/login` page with secure token management and `ProtectedRoute` redirection.
+  - Role-based authorization: Employees cannot access other employees' records or administrative settings.
+  - User management page (`/users`) for viewing, creating accounts, and toggling active/inactive status.
+  - Production security validation: Settings validator prevents default or weak JWT secrets in production.
+- **Lead Lifecycle & Pipeline Management**:
+  - Full CRUD lifecycle with search, dynamic multi-attribute filtering, priority, source, and notes.
+  - 8-stage interactive Kanban board (`New → Contacted → Qualified → Meeting → Proposal → Negotiation → Won / Lost`) with drag-and-drop.
   - Dedicated `/archived-leads` page with instant lead restoration.
-  - Dedicated `/users` page for Admin user account creation and active/inactive status management.
-  - Table pagination across Activities and Clients.
-  - CSV & Excel export triggers.
+  - Centralized client profiles with contact cards and full historical activity timeline.
+- **Follow-ups & Activity Audit**:
+  - Task scheduling with `Today`, `Upcoming`, and `Overdue` filtering and one-click completion.
+  - Unified company-wide activity audit trail tracking stage transitions, outreach, and user events.
+  - Table pagination across Activities and Clients tables.
+- **Dashboards & Data Management**:
+  - Executive and Employee dashboard metrics (lead counts, won revenue, conversion rates, pipeline values).
+  - Bulk CSV and Excel (`.xlsx`) import with row-level validation.
+  - CSV and Excel export triggers protected by formula injection defense (`=`, `+`, `-`, `@` escaped).
+  - Multi-factor duplicate lead detection (matching by email, phone, company, and contact name).
+- **Integrations & AI Architecture**:
+  - Webhook security: HMAC-SHA256 signature validation with persistent crash-resilient event deduplication.
+  - AI backend endpoints: Lead scoring, conversion probability, NLP summaries, next-best action, AI message drafting, and Daily Manager.
+- **Testing & Verification**:
+  - 46 backend pytest tests passing (100%).
+  - 26 frontend functional tests passing (100%).
   - Clean Vite production build in < 1 second.
 
-#### 2. What Needs to be Done (Pending Tasks by Role)
-- **New Team Members (Integrations & Cloud DB)**:
+#### 2. What Needs to be Done (Pending Tasks)
+- **Third-Party API Credentials & Live Handshakes**:
   - Meta Developer App ID & App Secret for live Facebook/Instagram Lead Ads webhook subscriptions.
   - WhatsApp Cloud API permanent system access token & Phone Number ID for live messaging.
   - Google Cloud Console OAuth 2.0 Client ID / Secret for live Google Calendar & Gmail synchronization.
-  - Setting production cloud PostgreSQL database connection string (`DATABASE_URL`).
-- **Thrija (AI / ML Models)**:
+- **Cloud Database Provisioning**:
+  - Setting the production cloud PostgreSQL database connection string (`DATABASE_URL`).
+- **AI/ML Model Fine-Tuning**:
   - Connecting custom trained ML models (e.g. Scikit-learn / XGBoost lead scoring model) or live Gemini/OpenAI API prompts to replace heuristic fallbacks in `backend/app/services/ai_service.py`.
-- **Entire Team (Deployment & Final Demo)**:
+- **Final Deployment & Demo Preparation**:
   - Deploy frontend to Vercel/Netlify and backend to Render/Fly.io.
   - Prepare final project slides and demo for November 3, 2026, 6:00 PM IST submission.
 
