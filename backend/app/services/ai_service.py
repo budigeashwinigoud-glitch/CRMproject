@@ -23,10 +23,10 @@ def get_lead_insights(lead: Lead) -> AILeadInsightsResponse:
     """
     Returns AI-driven insights for a lead, incorporating current ML score,
     heuristic feature importance factors, stage recommendation, and next actions.
-    This contract allows Thrija's models to plug in while providing realistic defaults.
+    Accurately returns persisted conversion_probability when available.
     """
     score = lead.ai_score if lead.ai_score is not None else 70
-    prob = round(score / 100.0, 2)
+    prob = lead.conversion_probability if lead.conversion_probability is not None else round(score / 100.0, 2)
     
     # Heuristic key factors based on lead data
     key_factors = []
@@ -74,10 +74,13 @@ def get_lead_insights(lead: Lead) -> AILeadInsightsResponse:
 
 def update_lead_score(db: Session, lead: Lead, req: AIScoreUpdateRequest, specialist_name: str) -> Lead:
     """
-    Persists ML score update into lead record and logs an activity audit record.
+    Persists ML score and independent conversion probability into lead record and logs an activity audit record.
     """
     old_score = lead.ai_score
     lead.ai_score = req.aiScore
+    lead.conversion_probability = req.conversionProbability
+    lead.ai_model_version = req.modelVersion
+    lead.ai_scored_at = datetime.now(timezone.utc)
     
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
     act = Activity(
@@ -160,7 +163,8 @@ def generate_message_draft(lead: Lead, req: AIMessageDraftRequest) -> AIMessageD
         subject=subject,
         bodyDraft=body,
         suggestedSendTime="Tomorrow at 10:00 AM Local Time",
-        confidence=0.92
+        confidence=None,
+        isHeuristicTemplate=True
     )
 
 

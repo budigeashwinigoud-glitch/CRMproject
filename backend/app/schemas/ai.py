@@ -40,7 +40,8 @@ class AIMessageDraftResponse(BaseModel):
     subject: Optional[str] = None
     bodyDraft: str
     suggestedSendTime: str
-    confidence: float
+    confidence: Optional[float] = Field(None, description="Model prediction confidence if produced by ML model")
+    isHeuristicTemplate: bool = Field(True, description="True if output is a baseline template pending Thrija's LLM generation")
 
 
 class AIDailyManagerItem(BaseModel):

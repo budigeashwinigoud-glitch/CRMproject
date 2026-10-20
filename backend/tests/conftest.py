@@ -30,7 +30,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 def setup_test_db():
     Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
-    seed_database(session)
+    seed_database(session, seed_demo=True)
     session.close()
     yield
     Base.metadata.drop_all(bind=engine)

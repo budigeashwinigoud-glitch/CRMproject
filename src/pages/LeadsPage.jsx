@@ -76,18 +76,20 @@ export const LeadsPage = () => {
 
   const fileInputRef = React.useRef(null);
 
-  const handleExport = (format = 'csv') => {
+  const handleExport = async (format = 'csv') => {
     try {
+      showToast(`Generating ${format.toUpperCase()} export...`, 'info');
       const filters = {};
       if (selectedStage !== 'All') filters.stage = selectedStage;
       if (selectedPriority !== 'All') filters.priority = selectedPriority;
       if (selectedSource !== 'All') filters.source = selectedSource;
       if (selectedEmployee !== 'All') filters.employee = selectedEmployee;
-      const url = crmApi.getExportLeadsUrl(format, filters);
-      window.open(url, '_blank');
-      showToast(`Exporting leads (${format.toUpperCase()})...`, 'info');
+
+      await crmApi.exportLeads(format, filters);
+      showToast(`Export completed: saved ${format.toUpperCase()} file.`, 'success');
     } catch (err) {
-      showToast('Export failed', 'error');
+      console.error(err);
+      showToast(err.message || 'Export failed', 'error');
     }
   };
 
@@ -205,15 +207,16 @@ export const LeadsPage = () => {
             <Download size={15} />
             <span>Export CSV</span>
           </button>
+
           <button
-  type="button"
-  className="btn btn-secondary"
-  onClick={() => handleExport('xlsx')}
-  title="Export leads to Excel"
->
-  <Download size={15} />
-  <span>Export Excel</span>
-</button>
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => handleExport('xlsx')}
+            title="Export filtered leads to Excel"
+          >
+            <Download size={15} />
+            <span>Export Excel</span>
+          </button>
 
           <button
             type="button"

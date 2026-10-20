@@ -389,8 +389,13 @@ INITIAL_ACTIVITIES_DATA = [
 ]
 
 
-def seed_database(db: Session):
-    print("[SEED] Initializing and seeding Belvo CRM database...")
+def seed_database(db: Session, force: bool = False, seed_demo: bool = False):
+    from app.config import settings
+    if settings.ENVIRONMENT.lower() == "production" and not force:
+        print("[SEED] Production environment detected. Skipping automatic demo data seed.")
+        return
+
+    print("[SEED] Initializing Belvo CRM system metadata (stages & user accounts)...")
 
     # 1. Pipeline Stages
     for s_data in DEFAULT_STAGES:
@@ -413,34 +418,69 @@ def seed_database(db: Session):
             db.add(user)
     db.commit()
 
-    # 3. Leads
-    for l_data in INITIAL_LEADS_DATA:
-        existing_lead = db.query(Lead).filter(Lead.id == l_data["id"]).first()
-        if not existing_lead:
-            db.add(Lead(**l_data, is_archived=False))
-    db.commit()
+    # 3. Only seed synthetic demo data if explicitly requested (e.g. test fixtures)
+    if seed_demo or force:
+        for l_data in INITIAL_LEADS_DATA:
+            existing_lead = db.query(Lead).filter(Lead.id == l_data["id"]).first()
+            if not existing_lead:
+                db.add(Lead(**l_data, is_archived=False))
+        db.commit()
 
-    # 4. Follow-ups
-    for fu_data in INITIAL_FOLLOW_UPS_DATA:
-        existing_fu = db.query(FollowUp).filter(FollowUp.id == fu_data["id"]).first()
-        if not existing_fu:
-            db.add(FollowUp(**fu_data))
-    db.commit()
+        for fu_data in INITIAL_FOLLOW_UPS_DATA:
+            existing_fu = db.query(FollowUp).filter(FollowUp.id == fu_data["id"]).first()
+            if not existing_fu:
+                db.add(FollowUp(**fu_data))
+        db.commit()
 
-    # 5. Activities
-    for act_data in INITIAL_ACTIVITIES_DATA:
-        existing_act = db.query(Activity).filter(Activity.id == act_data["id"]).first()
-        if not existing_act:
-            db.add(Activity(**act_data))
-    db.commit()
+        for act_data in INITIAL_ACTIVITIES_DATA:
+            existing_act = db.query(Activity).filter(Activity.id == act_data["id"]).first()
+            if not existing_act:
+                db.add(Activity(**act_data))
+        db.commit()
+        print("[OK] Demo records seeded.")
+    else:
+        print("[OK] Belvo CRM ready with ZERO default data.")
 
-    print("[OK] Belvo CRM seed completed successfully.")
+
+def provision_admin(db: Session, email: str, password: str, full_name: str = "System Admin"):
+    """Dedicated, secure CLI function for provisioning production administrators."""
+    existing_user = db.query(User).filter(User.email == email).first()
+    if existing_user:
+        print(f"[PROVISION] User with email {email} already exists.")
+        return existing_user
+
+    user = User(
+        full_name=full_name,
+        email=email,
+        password_hash=get_password_hash(password),
+        role="ADMIN",
+        is_active=True
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    print(f"[PROVISION] Administrator account successfully created: {email}")
+    return user
 
 
 if __name__ == "__main__":
-    Base.metadata.create_all(bind=engine)
+    import argparse
+    parser = argparse.ArgumentParser(description="Belvo CRM Seed & Admin Provisioning")
+    parser.add_argument("--provision-admin", action="store_true", help="Provision a production administrator account")
+    parser.add_argument("--email", type=str, help="Admin email")
+    parser.add_argument("--password", type=str, help="Admin password")
+    parser.add_argument("--name", type=str, default="System Admin", help="Admin full name")
+    parser.add_argument("--force-seed", action="store_true", help="Force synthetic demo seeding")
+    args = parser.parse_args()
+
     session = SessionLocal()
     try:
-        seed_database(session)
+        if args.provision_admin:
+            if not args.email or not args.password:
+                print("Error: --email and --password are required when using --provision-admin")
+                sys.exit(1)
+            provision_admin(session, email=args.email, password=args.password, full_name=args.name)
+        else:
+            seed_database(session, force=args.force_seed)
     finally:
         session.close()

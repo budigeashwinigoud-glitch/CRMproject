@@ -14,9 +14,19 @@ from app.schemas.follow_up import (
     FollowUpStatusUpdate,
     FollowUpResponse
 )
-from app.services.auth_service import get_current_user_optional
+from app.services.auth_service import get_current_user
 
 router = APIRouter(prefix="/follow-ups", tags=["Follow-ups"])
+
+
+def check_follow_up_access(fu: FollowUp, current_user: User):
+    """Enforces record-level authorization on follow-up tasks."""
+    if current_user.role.upper() == "EMPLOYEE":
+        if fu.assigned_employee != current_user.full_name and fu.assigned_user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access forbidden: This follow-up is assigned to another team specialist."
+            )
 
 
 @router.get("", response_model=List[FollowUpResponse])
@@ -26,11 +36,12 @@ def get_follow_ups(
     lead_id: Optional[str] = Query(None, alias="leadId"),
     priority: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     query = db.query(FollowUp)
 
-    if current_user and current_user.role.upper() == "EMPLOYEE" and not employee:
+    # Enforce strict employee isolation
+    if current_user.role.upper() == "EMPLOYEE":
         query = query.filter(FollowUp.assigned_employee == current_user.full_name)
     elif employee and employee != "All":
         query = query.filter(FollowUp.assigned_employee == employee)
@@ -65,18 +76,32 @@ def get_follow_ups(
 def create_follow_up(
     fu_in: FollowUpCreate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     new_id = f"FU-{int(time.time() * 1000) % 100000:04d}"
     
-    # If lead_id provided, verify company and contact
+    # If lead_id provided, verify lead existence and access
     lead = None
     if fu_in.lead_id:
         lead = db.query(Lead).filter(Lead.id == fu_in.lead_id).first()
+        if not lead:
+            raise HTTPException(status_code=404, detail=f"Lead {fu_in.lead_id} not found")
+        if current_user.role.upper() == "EMPLOYEE":
+            if lead.assigned_employee != current_user.full_name and lead.assigned_user_id != current_user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Cannot create follow-up for a lead assigned to another specialist."
+                )
 
     company_name = fu_in.company or (lead.company if lead else "")
     contact_name = fu_in.lead_name or (lead.full_name if lead else "General Follow-up")
-    assigned = fu_in.assigned_employee or (lead.assigned_employee if lead else (current_user.full_name if current_user else "Ashwini Sharma"))
+    
+    if current_user.role.upper() == "EMPLOYEE":
+        assigned = current_user.full_name
+        assigned_id = current_user.id
+    else:
+        assigned = fu_in.assigned_employee or (lead.assigned_employee if lead else current_user.full_name)
+        assigned_id = fu_in.assigned_user_id or current_user.id
 
     fu = FollowUp(
         id=new_id,
@@ -90,7 +115,7 @@ def create_follow_up(
         priority=fu_in.priority or "Medium",
         status=fu_in.status or "Pending",
         assigned_employee=assigned,
-        assigned_user_id=fu_in.assigned_user_id or (current_user.id if current_user else None),
+        assigned_user_id=assigned_id,
         notes=fu_in.notes or ""
     )
     db.add(fu)
@@ -105,7 +130,7 @@ def create_follow_up(
         type="task",
         description=f"Scheduled {fu.type} task: \"{fu.title}\" due {fu.due_date}",
         timestamp=now_str,
-        performed_by=current_user.full_name if current_user else assigned
+        performed_by=current_user.full_name
     )
     db.add(activity)
 
@@ -114,20 +139,11 @@ def create_follow_up(
     return FollowUpResponse.from_orm_model(fu)
 
 
-def check_follow_up_access(fu: FollowUp, current_user: Optional[User]):
-    if current_user and current_user.role.upper() == "EMPLOYEE":
-        if fu.assigned_employee != current_user.full_name and fu.assigned_user_id != current_user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access forbidden: This follow-up is assigned to another team specialist."
-            )
-
-
 @router.get("/{follow_up_id}", response_model=FollowUpResponse)
 def get_follow_up(
     follow_up_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
@@ -141,7 +157,7 @@ def update_follow_up(
     follow_up_id: str,
     fu_in: FollowUpUpdate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
@@ -163,10 +179,11 @@ def update_follow_up(
         fu.status = fu_in.status
         if fu.status == "Completed":
             fu.completed_at = datetime.now(timezone.utc)
-    if fu_in.assigned_employee is not None:
-        fu.assigned_employee = fu_in.assigned_employee
-    if fu_in.assigned_user_id is not None:
-        fu.assigned_user_id = fu_in.assigned_user_id
+    if current_user.role.upper() == "ADMIN":
+        if fu_in.assigned_employee is not None:
+            fu.assigned_employee = fu_in.assigned_employee
+        if fu_in.assigned_user_id is not None:
+            fu.assigned_user_id = fu_in.assigned_user_id
     if fu_in.notes is not None:
         fu.notes = fu_in.notes
 
@@ -180,7 +197,7 @@ def update_follow_up_status(
     follow_up_id: str,
     body: FollowUpStatusUpdate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:
@@ -192,9 +209,7 @@ def update_follow_up_status(
     if body.status == "Completed":
         fu.completed_at = datetime.now(timezone.utc)
 
-    # Activity log
     now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
-    performer = current_user.full_name if current_user else (fu.assigned_employee or "Ashwini Sharma")
     activity = Activity(
         id=f"ACT-{int(time.time() * 1000) % 100000:04d}",
         lead_id=fu.lead_id,
@@ -203,7 +218,7 @@ def update_follow_up_status(
         type="task",
         description=f"Follow-up \"{fu.title}\" marked as {fu.status}",
         timestamp=now_str,
-        performed_by=performer
+        performed_by=current_user.full_name
     )
     db.add(activity)
 
@@ -216,7 +231,7 @@ def update_follow_up_status(
 def complete_follow_up(
     follow_up_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     return update_follow_up_status(
         follow_up_id=follow_up_id,
@@ -230,7 +245,7 @@ def complete_follow_up(
 def delete_follow_up(
     follow_up_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     fu = db.query(FollowUp).filter(FollowUp.id == follow_up_id).first()
     if not fu:

@@ -1,5 +1,6 @@
-def test_dashboard_metrics_calculations(client):
-    res = client.get("/api/dashboard/metrics")
+def test_dashboard_metrics_calculations(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    res = client.get("/api/dashboard/metrics", headers=headers)
     assert res.status_code == 200
     metrics = res.json()
 
@@ -14,8 +15,9 @@ def test_dashboard_metrics_calculations(client):
     assert "High" in metrics["priorityCounts"]
 
 
-def test_employee_metrics_calculations(client):
-    res = client.get("/api/dashboard/employee-metrics?employee=Carlos Mendes")
+def test_employee_metrics_calculations(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    res = client.get("/api/dashboard/employee-metrics?employee=Carlos Mendes", headers=headers)
     assert res.status_code == 200
     data = res.json()
     assert data["employee"] == "Carlos Mendes"

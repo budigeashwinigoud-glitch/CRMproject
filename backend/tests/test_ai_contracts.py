@@ -56,7 +56,7 @@ def test_ai_message_draft_contract(client, employee_token):
     assert data["leadId"] == "LEAD-101"
     assert data["channel"] == "Email"
     assert "Belvo" in data["bodyDraft"]
-    assert data["confidence"] > 0.8
+    assert data["isHeuristicTemplate"] is True
 
 
 def test_ai_daily_manager_contract(client, employee_token):

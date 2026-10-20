@@ -1,5 +1,6 @@
-def test_follow_ups_crud_and_completion(client):
-    res_list = client.get("/api/follow-ups")
+def test_follow_ups_crud_and_completion(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    res_list = client.get("/api/follow-ups", headers=headers)
     assert res_list.status_code == 200
     fus = res_list.json()
     assert len(fus) >= 7
@@ -15,7 +16,7 @@ def test_follow_ups_crud_and_completion(client):
         "assignedEmployee": "Ashwini Sharma",
         "notes": "Bring legal counsel"
     }
-    create_res = client.post("/api/follow-ups", json=new_fu_payload)
+    create_res = client.post("/api/follow-ups", json=new_fu_payload, headers=headers)
     assert create_res.status_code == 201
     created_fu = create_res.json()
     fu_id = created_fu["id"]
@@ -23,42 +24,44 @@ def test_follow_ups_crud_and_completion(client):
     assert created_fu["status"] == "Pending"
 
     # Mark completed
-    comp_res = client.post(f"/api/follow-ups/{fu_id}/complete")
+    comp_res = client.post(f"/api/follow-ups/{fu_id}/complete", headers=headers)
     assert comp_res.status_code == 200
     assert comp_res.json()["status"] == "Completed"
 
 
-def test_notes_creation_and_retrieval(client):
+def test_notes_creation_and_retrieval(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
     note_payload = {
         "content": "Discussed volume-based tier discounts with CFO.",
         "authorName": "Carlos Mendes"
     }
-    create_res = client.post("/api/leads/LEAD-102/notes", json=note_payload)
+    create_res = client.post("/api/leads/LEAD-102/notes", json=note_payload, headers=headers)
     assert create_res.status_code == 201
     note_data = create_res.json()
     assert note_data["leadId"] == "LEAD-102"
     assert note_data["content"] == "Discussed volume-based tier discounts with CFO."
 
-    get_notes_res = client.get("/api/leads/LEAD-102/notes")
+    get_notes_res = client.get("/api/leads/LEAD-102/notes", headers=headers)
     assert get_notes_res.status_code == 200
     notes = get_notes_res.json()
     assert len(notes) >= 1
     assert any("Discussed volume-based" in n["content"] for n in notes)
 
 
-def test_activities_logging_and_filtering(client):
+def test_activities_logging_and_filtering(client, admin_token):
+    headers = {"Authorization": f"Bearer {admin_token}"}
     act_payload = {
         "leadId": "LEAD-103",
         "type": "email",
         "description": "Sent updated technical integration manual.",
         "performedBy": "Ashwini Sharma"
     }
-    post_res = client.post("/api/activities", json=act_payload)
+    post_res = client.post("/api/activities", json=act_payload, headers=headers)
     assert post_res.status_code == 201
     act_data = post_res.json()
     assert act_data["type"] == "email"
 
-    filter_res = client.get("/api/activities?leadId=LEAD-103")
+    filter_res = client.get("/api/activities?leadId=LEAD-103", headers=headers)
     assert filter_res.status_code == 200
     acts = filter_res.json()
     assert len(acts) >= 1

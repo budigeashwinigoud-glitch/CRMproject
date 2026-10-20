@@ -87,7 +87,6 @@ export const crmApi = {
   },
   getArchivedLeads: async () => crmApi.getLeads({ include_archived: true }),
 
-
   getLeadById: async (id) => {
     return request(`/leads/${id}`);
   },
@@ -174,6 +173,13 @@ export const crmApi = {
     });
   },
 
+  updateFollowUpStatus: async (id, status) => {
+    return request(`/follow-ups/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status })
+    });
+  },
+
   updateFollowupStatus: async (id, status) => {
     return request(`/follow-ups/${id}/status`, {
       method: 'PATCH',
@@ -210,7 +216,8 @@ export const crmApi = {
       body: JSON.stringify(noteData)
     });
   },
-    // User Management
+
+  // User Management
   getUsers: async () => {
     return request('/users');
   },
@@ -229,7 +236,6 @@ export const crmApi = {
     });
   },
 
-
   // CSV & Excel Import / Export
   importLeads: async (file, dryRun = false, updateDuplicates = false) => {
     const formData = new FormData();
@@ -243,8 +249,37 @@ export const crmApi = {
   getExportLeadsUrl: (format = 'csv', filters = {}) => {
     const query = new URLSearchParams({ format, ...filters }).toString();
     return `${API_BASE_URL}/export/leads?${query}`;
+  },
+
+  exportLeads: async (format = 'csv', filters = {}) => {
+    const query = new URLSearchParams({ format, ...filters }).toString();
+    const token = localStorage.getItem('belvo_crm_token');
+    const response = await fetch(`${API_BASE_URL}/export/leads?${query}`, {
+      headers: {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    });
+
+    if (!response.ok) {
+      let err = `Export failed with status ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData?.detail) err = errorData.detail;
+      } catch {}
+      throw new Error(err);
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `belvo_crm_leads_${Date.now()}.${format === 'xlsx' ? 'xlsx' : 'csv'}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+    return true;
   }
 };
-
 
 export default crmApi;

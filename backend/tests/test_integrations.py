@@ -111,7 +111,7 @@ def test_calendar_and_email_sync(client, employee_token):
     res_cal = client.post("/api/integrations/calendar/sync-event", json=cal_payload, headers=headers)
     assert res_cal.status_code == 200
     assert res_cal.json()["success"] is True
-    assert res_cal.json()["status"] == "CONFIRMED"
+    assert res_cal.json()["status"] == "CONFIRMED_LOCAL"
 
     # 2. Email interaction sync
     mail_payload = {

@@ -30,6 +30,9 @@ class Lead(Base):
     
     ai_score = Column(Integer, default=75)
     ai_summary = Column(Text, nullable=True)
+    conversion_probability = Column(Float, nullable=True)
+    ai_model_version = Column(String(50), nullable=True)
+    ai_scored_at = Column(DateTime, nullable=True)
     
     is_archived = Column(Boolean, default=False, index=True)
     archived_at = Column(DateTime, nullable=True)

@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Header, Query, Request, s
 from sqlalchemy.orm import Session
 from typing import Dict, Any, Optional
 
+from app.config import settings
 from app.database import get_db
+from app.models.user import User
+from app.services.auth_service import get_current_user
 from app.schemas.integrations import (
     WebsiteLeadWebhookPayload,
-    MetaLeadWebhookPayload,
-    WhatsAppWebhookPayload,
     CalendarSyncEventRequest,
     CalendarSyncEventResponse,
     EmailSyncInteractionRequest,
@@ -27,8 +28,8 @@ router = APIRouter(prefix="/integrations", tags=["Integration Architecture"])
 
 
 @router.get("/status", response_model=IntegrationStatusResponse)
-def get_status():
-    """Diagnostic endpoint checking external provider integration readiness."""
+def get_status(current_user: User = Depends(get_current_user)):
+    """Diagnostic endpoint checking external provider integration readiness. Requires auth."""
     return IntegrationStatusResponse(providers=get_integration_status_list())
 
 
@@ -37,7 +38,10 @@ def webhook_website_lead(
     payload: WebsiteLeadWebhookPayload,
     db: Session = Depends(get_db)
 ):
-    """Ingest website lead capture form submissions."""
+    """
+    Public inbound lead capture form submissions from Belvo landing page.
+    Includes duplicate detection and safe default assignment rules.
+    """
     result = process_website_lead_form(db, payload)
     return result
 
@@ -48,9 +52,8 @@ def verify_whatsapp_challenge(
     hub_challenge: Optional[str] = Query(None, alias="hub.challenge"),
     hub_verify_token: Optional[str] = Query(None, alias="hub.verify_token")
 ):
-    """Verify Meta / WhatsApp Cloud API webhook challenge."""
-    expected_token = "belvo-crm-wa-verify-token-2026"
-    if hub_mode == "subscribe" and hub_verify_token == expected_token:
+    """Verify Meta / WhatsApp Cloud API webhook challenge using configured token."""
+    if hub_mode == "subscribe" and hub_verify_token == settings.WHATSAPP_VERIFY_TOKEN:
         return int(hub_challenge) if (hub_challenge and hub_challenge.isdigit()) else hub_challenge
     raise HTTPException(status_code=403, detail="Verification token mismatch")
 
@@ -60,20 +63,44 @@ def webhook_whatsapp_message(
     payload: Dict[str, Any],
     db: Session = Depends(get_db)
 ):
-    """Receive incoming WhatsApp message and link to lead timeline."""
-    sender = "Unknown"
-    text = "Inbound message"
+    """
+    Receive incoming WhatsApp message and link to lead timeline.
+    Parses real nested provider payload or simplified test fixture.
+    """
+    sender = None
+    text = None
+    msg_id = None
 
-    # Support standard and simplified testing payloads
-    if "messages" in payload and payload["messages"]:
-        msg = payload["messages"][0]
-        sender = msg.get("from") or msg.get("from_number") or sender
-        text = msg.get("text", {}).get("body") if isinstance(msg.get("text"), dict) else str(msg.get("text") or text)
+    # 1. Parse real nested Meta / WhatsApp Cloud API payload
+    if "entry" in payload and payload["entry"]:
+        entry = payload["entry"][0]
+        if "changes" in entry and entry["changes"]:
+            val = entry["changes"][0].get("value", {})
+            messages = val.get("messages", [])
+            if messages:
+                m = messages[0]
+                msg_id = m.get("id")
+                sender = m.get("from")
+                if m.get("type") == "text":
+                    text = m.get("text", {}).get("body")
+    # 2. Simplified fixture support
+    elif "messages" in payload and payload["messages"]:
+        m = payload["messages"][0]
+        msg_id = m.get("id")
+        sender = m.get("from") or m.get("from_number")
+        text = m.get("text", {}).get("body") if isinstance(m.get("text"), dict) else str(m.get("text") or "")
     elif "sender" in payload:
         sender = payload.get("sender")
-        text = payload.get("body", "Hello Belvo")
+        text = payload.get("body")
+        msg_id = payload.get("message_id")
 
-    result = process_whatsapp_inbound_message(db, sender=str(sender), text=str(text))
+    if not sender or not text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Malformed WhatsApp payload: sender and message body are required."
+        )
+
+    result = process_whatsapp_inbound_message(db, sender=str(sender), text=str(text), msg_id=msg_id)
     return result
 
 
@@ -83,48 +110,60 @@ async def webhook_meta_lead_ads(
     db: Session = Depends(get_db),
     x_hub_signature_256: Optional[str] = Header(None)
 ):
-    """Receive Meta Lead Ads event with signature validation & idempotency."""
+    """
+    Receive Meta Lead Ads event with HMAC-SHA256 signature verification & persistent idempotency.
+    """
     body_bytes = await request.body()
 
-    # If secret header configured, verify HMAC signature
-    meta_app_secret = "belvo_meta_app_secret_test"
-    if x_hub_signature_256:
-        is_valid = verify_hmac_sha256(body_bytes, x_hub_signature_256, meta_app_secret)
+    # In production, signature is strictly required
+    meta_secret = settings.META_APP_SECRET
+    if settings.ENVIRONMENT.lower() == "production" or x_hub_signature_256 or meta_secret:
+        if not x_hub_signature_256:
+            raise HTTPException(status_code=401, detail="Missing required x-hub-signature-256 header")
+        is_valid = verify_hmac_sha256(body_bytes, x_hub_signature_256, meta_secret or "")
         if not is_valid:
             raise HTTPException(status_code=401, detail="Invalid Meta HMAC signature")
 
-    payload = await request.json()
-    leadgen_id = f"meta_{int(request.client.port if request.client else 8000)}_{len(body_bytes)}"
+    try:
+        payload = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Malformed JSON payload")
+
+    leadgen_id = None
     form_data = {}
 
     if "entry" in payload and payload["entry"]:
         entry = payload["entry"][0]
-        leadgen_id = entry.get("id", leadgen_id)
         if "changes" in entry and entry["changes"]:
             val = entry["changes"][0].get("value", {})
-            leadgen_id = val.get("leadgen_id", leadgen_id)
+            leadgen_id = val.get("leadgen_id")
             form_data = val.get("field_data", {})
     elif "leadgen_id" in payload:
-        leadgen_id = payload["leadgen_id"]
-        form_data = payload.get("form_data", {})
+        leadgen_id = payload.get("leadgen_id")
+        form_data = payload.get("field_data") or payload.get("form_data", {})
 
-    result = process_meta_lead_ad(db, leadgen_id=str(leadgen_id), form_data=form_data)
+    if not leadgen_id:
+        raise HTTPException(status_code=400, detail="Invalid Meta payload: leadgen_id missing")
+
+    result = process_meta_lead_ad(db, leadgen_id=str(leadgen_id), form_data_raw=form_data, raw_bytes=body_bytes)
     return result
 
 
 @router.post("/calendar/sync-event", response_model=CalendarSyncEventResponse)
 def sync_calendar(
     req: CalendarSyncEventRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """Sync scheduled meeting with Google Calendar adapter."""
-    return sync_google_calendar_event(db, req)
+    """Sync scheduled meeting with Google Calendar adapter. Requires auth and verifies lead permissions."""
+    return sync_google_calendar_event(db, req, current_user)
 
 
 @router.post("/email/sync-interaction", response_model=EmailSyncInteractionResponse)
 def sync_email(
     req: EmailSyncInteractionRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """Sync email interaction with Outlook/Gmail connector adapter."""
-    return sync_email_interaction(db, req)
+    """Sync email interaction with Outlook/Gmail adapter. Requires auth and verifies lead permissions."""
+    return sync_email_interaction(db, req, current_user)

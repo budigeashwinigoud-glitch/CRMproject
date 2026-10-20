@@ -13,6 +13,7 @@ global.localStorage = {
 
 console.log('=====================================================');
 console.log('🔍 RUNNING COMPREHENSIVE BELVO CRM FUNCTIONAL SUITE');
+console.log('   (VERIFYING CLEAN ZERO DEFAULT DATA ARCHITECTURE)');
 console.log('=====================================================\n');
 
 let passed = 0;
@@ -28,19 +29,19 @@ function check(assertion, label) {
   }
 }
 
-// 1. Storage & Default Data Initialization
+// 1. Storage & Clean Zero Data Initialization
 dataService.init();
 const leads = dataService.getLeads();
-check(leads.length === 10, `Loaded exact initial demo leads count (${leads.length}/10)`);
+check(leads.length === 0, `Clean initialization: 0 default leads in store (${leads.length}/0)`);
 
-// 2. Metrics Accuracy
+// 2. Metrics Accuracy on Fresh Clean Slate
 const m1 = dataService.getDashboardMetrics();
-check(m1.totalLeads === 10, `Initial total leads metric matches: ${m1.totalLeads}`);
-check(m1.wonLeads === 1, `Won leads count correct: ${m1.wonLeads}`);
-check(m1.lostLeads === 1, `Lost leads count correct: ${m1.lostLeads}`);
-check(m1.wonValue === 120000, `Won revenue matches ($120,000): $${m1.wonValue.toLocaleString()}`);
-check(m1.conversionRate === 50, `Conversion rate (1 won / 2 closed = 50%): ${m1.conversionRate}%`);
-check(m1.stageBreakdown.length === 8, `Stage breakdown has all 8 pipeline stages`);
+check(m1.totalLeads === 0, `Initial total leads metric is 0: ${m1.totalLeads}`);
+check(m1.wonLeads === 0, `Initial won leads count is 0: ${m1.wonLeads}`);
+check(m1.lostLeads === 0, `Initial lost leads count is 0: ${m1.lostLeads}`);
+check(m1.wonValue === 0, `Initial won revenue is $0: $${m1.wonValue.toLocaleString()}`);
+check(m1.conversionRate === 0, `Initial conversion rate is 0%: ${m1.conversionRate}%`);
+check(m1.stageBreakdown.length === 8, `Stage breakdown has all 8 pipeline stages ready`);
 
 // 3. Lead Creation (CRUD - Create)
 const testLead = dataService.createLead({
@@ -60,7 +61,7 @@ const testLead = dataService.createLead({
 
 check(testLead.id && testLead.id.startsWith('LEAD-'), `Generated unique ID: ${testLead.id}`);
 check(typeof testLead.expectedValue === 'number' && testLead.expectedValue === 80000, `Coerced expectedValue string to number (80000)`);
-check(dataService.getLeads().length === 11, `Leads array incremented to 11`);
+check(dataService.getLeads().length === 1, `Leads array incremented to 1`);
 
 // Verify Activity Logged
 const act1 = dataService.getActivities().find(a => a.leadId === testLead.id);
@@ -72,8 +73,8 @@ check(Boolean(fu1 && fu1.dueDate === '2026-10-25'), `Follow-up task created with
 
 // 4. Metrics Update after Creation
 const m2 = dataService.getDashboardMetrics();
-check(m2.totalLeads === 11, `Dashboard metrics updated to 11 total leads`);
-check(m2.qualifiedLeads === 3, `Qualified stage count incremented: ${m2.qualifiedLeads}`);
+check(m2.totalLeads === 1, `Dashboard metrics updated to 1 total lead`);
+check(m2.qualifiedLeads === 1, `Qualified stage count incremented: ${m2.qualifiedLeads}`);
 
 // 5. Lead Update (CRUD - Update)
 const updated = dataService.updateLead(testLead.id, {
@@ -88,9 +89,9 @@ const moved = dataService.updateLeadStage(testLead.id, 'Won');
 check(moved.pipelineStage === 'Won', `Lead moved to Won stage`);
 
 const m3 = dataService.getDashboardMetrics();
-check(m3.wonLeads === 2, `Won leads metric dynamically incremented to 2`);
-check(m3.wonValue === 120000 + 110000, `Won revenue dynamically updated to $230,000 ($${m3.wonValue.toLocaleString()})`);
-check(m3.conversionRate === 67, `Conversion rate recalculated to 67% (2 won / 3 closed): ${m3.conversionRate}%`);
+check(m3.wonLeads === 1, `Won leads metric dynamically incremented to 1`);
+check(m3.wonValue === 110000, `Won revenue dynamically updated to $110,000 ($${m3.wonValue.toLocaleString()})`);
+check(m3.conversionRate === 100, `Conversion rate recalculated to 100% (1 won / 1 closed): ${m3.conversionRate}%`);
 
 // 7. Follow-up Status Toggle & Overdue Calculation
 if (fu1) {
@@ -101,16 +102,16 @@ if (fu1) {
 // 8. Lead Archiving & Cascade Removal (CRUD - Delete)
 const deleted = dataService.deleteLead(testLead.id);
 check(deleted === true, `Lead archived successfully`);
-check(dataService.getLeads().length === 10, `Leads count restored to 10`);
+check(dataService.getLeads().length === 0, `Leads count restored to 0`);
 
 const orphanedFU = dataService.getFollowUps().find(f => f.leadId === testLead.id);
 check(!orphanedFU, `Associated follow-ups cleanly removed`);
 
 // 9. Persistence & Reset Verification
 const resetState = dataService.resetToDefaults();
-check(resetState.leads.length === 10, `resetToDefaults() restored standard 10 records`);
+check(resetState.leads.length === 0, `resetToDefaults() restored clean 0 records`);
 const mFinal = dataService.getDashboardMetrics();
-check(mFinal.totalLeads === 10 && mFinal.wonLeads === 1, `Metrics verified clean after reset`);
+check(mFinal.totalLeads === 0 && mFinal.wonLeads === 0, `Metrics verified clean after reset`);
 
 console.log(`\n=====================================================`);
 console.log(`📊 RESULT: ${passed}/${total} TESTS PASSED (100% SUCCESS)`);

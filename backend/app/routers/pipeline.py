@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -10,13 +10,16 @@ from app.schemas.pipeline_stage import (
     PipelineStageUpdate,
     PipelineStageResponse
 )
-from app.services.auth_service import get_current_user_optional, require_admin
+from app.services.auth_service import get_current_user, require_admin
 
 router = APIRouter(prefix="/pipeline", tags=["Pipeline Stages"])
 
 
 @router.get("/stages", response_model=List[PipelineStageResponse])
-def get_pipeline_stages(db: Session = Depends(get_db)):
+def get_pipeline_stages(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     stages = db.query(PipelineStage).filter(PipelineStage.is_active == True).order_by(PipelineStage.display_order).all()
     return [PipelineStageResponse.model_validate(s) for s in stages]
 
@@ -25,7 +28,7 @@ def get_pipeline_stages(db: Session = Depends(get_db)):
 def create_pipeline_stage(
     stage_in: PipelineStageCreate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(require_admin)  # Admin only
 ):
     existing = db.query(PipelineStage).filter(PipelineStage.id == stage_in.id).first()
     if existing:
@@ -53,7 +56,7 @@ def update_pipeline_stage(
     stage_id: str,
     stage_in: PipelineStageUpdate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(require_admin)  # Admin only
 ):
     stage = db.query(PipelineStage).filter(PipelineStage.id == stage_id).first()
     if not stage:
@@ -79,7 +82,7 @@ def update_pipeline_stage(
 def delete_pipeline_stage(
     stage_id: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(require_admin)  # Admin only
 ):
     stage = db.query(PipelineStage).filter(PipelineStage.id == stage_id).first()
     if not stage:

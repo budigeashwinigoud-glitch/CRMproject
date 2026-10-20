@@ -6,14 +6,13 @@ from app.models.user import User
 from app.schemas.dashboard import (
     DashboardMetricsResponse,
     EmployeeMetricsResponse,
-    StageBreakdownItem,
-    SourceBreakdownItem
+    StageBreakdownItem
 )
 from app.services.metrics_service import (
     calculate_dashboard_metrics,
     calculate_employee_metrics
 )
-from app.services.auth_service import get_current_user_optional
+from app.services.auth_service import get_current_user
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
@@ -22,11 +21,13 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 def get_metrics(
     employee: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
-    filter_emp = employee
-    if current_user and current_user.role.upper() == "EMPLOYEE":
+    # Enforce strict server-side employee isolation
+    if current_user.role.upper() == "EMPLOYEE":
         filter_emp = current_user.full_name
+    else:
+        filter_emp = employee
 
     return calculate_dashboard_metrics(db, employee=filter_emp)
 
@@ -35,12 +36,13 @@ def get_metrics(
 def get_emp_metrics(
     employee: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
-    if current_user and current_user.role.upper() == "EMPLOYEE":
+    # Enforce strict server-side employee isolation
+    if current_user.role.upper() == "EMPLOYEE":
         target_emp = current_user.full_name
     else:
-        target_emp = employee or (current_user.full_name if current_user else "Ashwini Sharma")
+        target_emp = employee or current_user.full_name
 
     return calculate_employee_metrics(db, employee=target_emp)
 
@@ -49,23 +51,11 @@ def get_emp_metrics(
 def get_pipeline_metrics(
     employee: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
-    filter_emp = employee
-    if current_user and current_user.role.upper() == "EMPLOYEE":
+    if current_user.role.upper() == "EMPLOYEE":
         filter_emp = current_user.full_name
+    else:
+        filter_emp = employee
     metrics = calculate_dashboard_metrics(db, employee=filter_emp)
     return metrics.stageBreakdown
-
-
-@router.get("/lead-sources", response_model=List[SourceBreakdownItem])
-def get_lead_sources(
-    employee: Optional[str] = Query(None),
-    db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
-):
-    filter_emp = employee
-    if current_user and current_user.role.upper() == "EMPLOYEE":
-        filter_emp = current_user.full_name
-    metrics = calculate_dashboard_metrics(db, employee=filter_emp)
-    return metrics.sourceBreakdown

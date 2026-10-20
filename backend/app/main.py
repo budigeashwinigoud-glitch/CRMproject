@@ -9,13 +9,15 @@ from app.routers import auth, users, leads, pipeline, follow_ups, activities, da
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure tables exist
-    Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    try:
-        seed_database(db)
-    finally:
-        db.close()
+    # In production, database schema must be managed exclusively via controlled Alembic migrations.
+    # Automatic table generation and synthetic demo seed injection are strictly disabled in production.
+    if settings.ENVIRONMENT.lower() != "production":
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        try:
+            seed_database(db)
+        finally:
+            db.close()
     yield
 
 

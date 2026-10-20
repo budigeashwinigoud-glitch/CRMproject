@@ -1,7 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, Response, status
-from fastapi.responses import StreamingResponse
-import io
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.lead import Lead
@@ -14,7 +12,7 @@ from app.services.import_export_service import (
     export_leads_to_csv,
     export_leads_to_excel
 )
-from app.services.auth_service import get_current_user_optional, require_admin
+from app.services.auth_service import get_current_user
 
 router = APIRouter(prefix="", tags=["Data Import and Export"])
 
@@ -25,7 +23,7 @@ async def import_leads(
     dry_run: bool = Query(False, description="Preview / validate without committing to database"),
     update_duplicates: bool = Query(False, description="Update existing duplicate leads instead of skipping"),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     filename = file.filename or ""
     lower_filename = filename.lower()
@@ -59,7 +57,13 @@ async def import_leads(
             detail="The uploaded file contains no data rows."
         )
 
-    performer = current_user.full_name if current_user else "Ashwini Sharma"
+    # If employee, force imported leads to be assigned to them to prevent assigning leads to others
+    if current_user.role.upper() == "EMPLOYEE":
+        for r in rows:
+            r["assigned_employee"] = current_user.full_name
+            r["assignedEmployee"] = current_user.full_name
+
+    performer = current_user.full_name
     report = process_lead_import(
         db=db,
         raw_rows=rows,
@@ -78,11 +82,12 @@ def export_leads(
     source: Optional[str] = Query(None),
     employee: Optional[str] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
+    current_user: User = Depends(get_current_user)
 ):
     query = db.query(Lead).filter(Lead.is_archived == False)
 
-    if current_user and current_user.role.upper() == "EMPLOYEE":
+    # Strictly isolate employees from exporting other specialists' data
+    if current_user.role.upper() == "EMPLOYEE":
         query = query.filter(Lead.assigned_employee == current_user.full_name)
     elif employee and employee != "All":
         query = query.filter(Lead.assigned_employee == employee)
