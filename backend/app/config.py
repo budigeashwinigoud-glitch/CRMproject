@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     GOOGLE_CALENDAR_CLIENT_ID: Optional[str] = os.getenv("GOOGLE_CALENDAR_CLIENT_ID", None)
     MICROSOFT_GRAPH_CLIENT_ID: Optional[str] = os.getenv("MICROSOFT_GRAPH_CLIENT_ID", None)
 
+    # AI / LLM Configuration
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", None)
+    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", None)
+    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
     @model_validator(mode="after")
     def validate_production_security(self):
         env = (self.ENVIRONMENT or "development").lower()

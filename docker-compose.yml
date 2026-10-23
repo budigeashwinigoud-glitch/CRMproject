@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  crm-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: belvo-crm-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - JWT_SECRET=belvo-crm-production-ultra-secure-key-2026-replace-in-env
+      - DATABASE_URL=sqlite:////app/data/crm.db
+      - CORS_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,http://localhost:5173
+      - INITIAL_ADMIN_EMAIL=admin@belvo.com
+      - INITIAL_ADMIN_PASSWORD=Admin@12345
+      - META_APP_SECRET=belvo_meta_app_secret_production
+      - WHATSAPP_VERIFY_TOKEN=belvo-crm-wa-verify-token-2026
+      # - OPENAI_API_KEY=sk-...
+      # - GEMINI_API_KEY=...
+    volumes:
+      - crm_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/dashboard/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  crm_data:
+    driver: local

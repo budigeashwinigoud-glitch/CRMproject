@@ -91,7 +91,7 @@ def update_lead_score(db: Session, lead: Lead, req: AIScoreUpdateRequest, specia
         type="note",
         description=f"AI Score adjusted from {old_score} to {req.aiScore}. Probability: {req.conversionProbability:.0%}. Drivers: {', '.join(req.keyFactors or [])}",
         timestamp=now_str,
-        performed_by=f"Thrija ML Engine ({req.modelVersion})"
+        performed_by=f"Belvo ML Engine ({req.modelVersion})"
     )
     db.add(act)
     db.commit()
@@ -114,7 +114,7 @@ def update_lead_summary(db: Session, lead: Lead, req: AISummaryUpdateRequest, sp
         type="note",
         description=f"AI NLP Summary updated. Sentiment: {req.sentiment} | Intent: {req.buyingIntent}",
         timestamp=now_str,
-        performed_by=f"Thrija NLP Engine ({req.modelVersion})"
+        performed_by=f"Belvo NLP Engine ({req.modelVersion})"
     )
     db.add(act)
     db.commit()
@@ -126,35 +126,83 @@ def generate_message_draft(lead: Lead, req: AIMessageDraftRequest) -> AIMessageD
     """
     Generates intelligent communication draft (Email, WhatsApp, LinkedIn)
     tailored to the lead's company, priority, and stage.
+    Supports real-time Generative AI via external LLM provider if configured,
+    or high-precision agency templates with graceful offline fallback.
     """
+    import os
+    import httpx
+    from app.config import settings
+
     channel = req.channel.capitalize()
     tone = (req.tone or "Professional").capitalize()
-    
+    objective = req.objective or "Follow up on agency partnership and scope"
+
+    # Attempt Live LLM Generation if API Key is configured
+    llm_key = settings.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if llm_key:
+        try:
+            prompt = (
+                f"Write a {tone.lower()} {channel} outreach message for Belvo Creative Agency to {lead.full_name} at {lead.company}.\n"
+                f"Service category: {lead.lead_category or 'Brand Building & Web Development'}.\n"
+                f"Stage: {lead.pipeline_stage}. Estimated value: {lead.currency} {lead.expected_value or 0}.\n"
+                f"Objective: {objective}.\n"
+                f"Include the name 'Belvo'. Keep it concise, engaging, and professional."
+            )
+            with httpx.Client(timeout=6.0) as client:
+                res = client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {llm_key}"},
+                    json={
+                        "model": getattr(settings, "OPENAI_MODEL", "gpt-4o-mini"),
+                        "messages": [
+                            {"role": "system", "content": "You are an AI sales copywriter for Belvo Creative Agency (belvo.buzz). Always include 'Belvo' in outputs."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.7,
+                        "max_tokens": 300
+                    }
+                )
+                if res.status_code == 200:
+                    generated_text = res.json()["choices"][0]["message"]["content"].strip()
+                    subject_line = f"Belvo & {lead.company} — Brand Acceleration Roadmap" if channel == "Email" else None
+                    return AIMessageDraftResponse(
+                        leadId=lead.id,
+                        channel=channel,
+                        subject=subject_line,
+                        bodyDraft=generated_text,
+                        suggestedSendTime="Tomorrow at 10:00 AM Local Time",
+                        confidence=0.96,
+                        isHeuristicTemplate=False
+                    )
+        except Exception:
+            pass  # Fall back to calibrated agency templates
+
+    # Calibrated High-Conversion Agency Templates (Guarantees 'Belvo' is present)
     if channel == "Whatsapp":
         subject = None
         body = (
-            f"Hola {lead.full_name}, greeting from Belvo! "
-            f"Following up on {lead.company}'s brand building, web development, and digital growth inquiry with Belvo (belvo.buzz). "
-            f"Do you have 10 minutes today to review the technical proposal? Looking forward to connecting."
+            f"Hola {lead.full_name}, greetings from Belvo! "
+            f"Following up on {lead.company}'s brand identity and digital scaling goals. "
+            f"Do you have 10 minutes today to review the creative brief and campaign roadmap? Looking forward to connecting."
         )
     elif channel == "Linkedin":
-        subject = f"Connecting regarding {lead.company} & Belvo Creative & Digital Agency"
+        subject = f"Connecting regarding {lead.company} & Belvo Creative Agency"
         body = (
             f"Hi {lead.full_name},\n\n"
-            f"I noticed {lead.company}'s growth initiatives in Latin America financial data solutions. "
-            f"Belvo powers seamless bank aggregation and fiscal enrichment for leading platforms. "
-            f"Would love to connect and share our developer sandbox documentation."
+            f"I noticed {lead.company}'s recent scaling initiatives and market presence. "
+            f"Belvo Creative Agency partners with high-growth brands to build standout visual identities, modern web applications, and performance marketing campaigns.\n\n"
+            f"Would love to connect and share our latest case studies and agency portfolio."
         )
     else:  # Email
-        subject = f"Belvo & {lead.company} — Next Steps on Open Finance Integration"
+        subject = f"Belvo & {lead.company} — Next Steps on Brand & Digital Growth"
         body = (
             f"Dear {lead.full_name},\n\n"
-            f"Thank you for connecting with the Belvo team regarding {lead.company}'s commercial requirements. "
-            f"Based on your focus in {lead.lead_category or 'financial services'}, our single API allows seamless "
-            f"access to 90%+ bank coverage and instant account verification across Mexico, Colombia, and Brazil.\n\n"
-            f"We would welcome the opportunity to walk through a tailored demo and discuss your estimated {lead.currency} "
-            f"{lead.expected_value:,.0f} deployment scope.\n\n"
-            f"Best regards,\nBelvo Commercial Solutions Team"
+            f"Thank you for connecting with the Belvo team regarding {lead.company}'s commercial objectives. "
+            f"Based on your focus in {lead.lead_category or 'creative brand scaling'}, our agency delivers end-to-end "
+            f"brand building, modern web development, and performance campaigns.\n\n"
+            f"We would welcome the opportunity to review our tailored proposal and discuss your estimated {lead.currency} "
+            f"{lead.expected_value:,.0f} project scope.\n\n"
+            f"Best regards,\nBelvo Creative Solutions Team"
         )
 
     return AIMessageDraftResponse(

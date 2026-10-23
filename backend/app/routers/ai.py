@@ -25,7 +25,7 @@ from app.services.ai_service import (
 )
 from app.routers.leads import check_lead_access
 
-router = APIRouter(prefix="/ai", tags=["AI Integration (Contracts for Thrija)"])
+router = APIRouter(prefix="/ai", tags=["AI & Machine Learning Intelligence"])
 
 
 @router.get("/leads/{lead_id}/insights", response_model=AILeadInsightsResponse)
@@ -53,7 +53,7 @@ def update_lead_ai_score_endpoint(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Contract endpoint: Update AI lead score and conversion probability from Thrija's ML engine.
+    Contract endpoint: Update AI lead score and conversion probability from Belvo ML engine.
     """
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:
@@ -71,7 +71,7 @@ def update_lead_ai_summary_endpoint(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Contract endpoint: Update AI NLP summary from Thrija's summarization pipeline.
+    Contract endpoint: Update AI NLP summary from Belvo NLP pipeline.
     """
     lead = db.query(Lead).filter(Lead.id == lead_id).first()
     if not lead:

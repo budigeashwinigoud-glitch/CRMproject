@@ -135,7 +135,7 @@ def process_meta_lead_ad(
     leadgen_id: str,
     form_data_raw: Any,
     raw_bytes: Optional[bytes] = None,
-    campaign_name: str = "LatAm Open Banking Campaign"
+    campaign_name: str = "Belvo Brand & Digital Growth Campaign"
 ) -> Dict[str, Any]:
     """Process incoming Meta Lead Ads payload with persistent database idempotency."""
     if is_event_processed(db, leadgen_id):
