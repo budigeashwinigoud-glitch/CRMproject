@@ -2,17 +2,17 @@
 # Stage 1: Build Frontend Assets (Vite)
 # ==========================================
 FROM node:20-alpine AS frontend-builder
-WORKDIR /app
+WORKDIR /app/frontend
 
 # Install frontend dependencies
-COPY package*.json ./
+COPY frontend/package*.json ./
 RUN npm ci
 
 # Copy frontend source code and build production bundle
-COPY index.html ./
-COPY vite.config.js ./
-COPY src ./src
-COPY public ./public
+COPY frontend/index.html ./
+COPY frontend/vite.config.js ./
+COPY frontend/src ./src
+COPY frontend/public ./public
 RUN npm run build
 
 # ==========================================
@@ -36,7 +36,7 @@ RUN pip install --no-cache-dir -r ./requirements.txt
 COPY backend ./backend
 
 # Copy built frontend assets from Stage 1 into backend static directory
-COPY --from=frontend-builder /app/dist ./dist
+COPY --from=frontend-builder /app/frontend/dist ./dist
 
 # Create storage directory for SQLite persistence
 RUN mkdir -p /app/data

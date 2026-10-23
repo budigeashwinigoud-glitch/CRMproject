@@ -358,39 +358,33 @@ CRMPROJECT/
 │   │   ├── config.py         # App configuration & JWT settings
 │   │   ├── database.py       # SQLAlchemy engine & session factory
 │   │   ├── main.py           # FastAPI application & middleware
-│   │   ├── seed.py           # Database seeder (users, stages, demo leads)
-│   │   ├── integrations/     # AI / ML and webhook interfaces
+│   │   ├── seed.py           # Database seeder (users, stages)
+│   │   ├── integrations/     # Webhook & integration adapters
 │   │   ├── models/           # SQLAlchemy ORM models (User, Lead, etc.)
 │   │   ├── routers/          # API route handlers
-│   │   ├── schemas/          # Pydantic v2 request/response schemas
-│   │   └── services/         # Business logic (duplicate, metrics, IO)
-│   ├── tests/                # Automated pytest test suite
-│   ├── alembic.ini
+│   │   ├── schemas/          # Pydantic v2 schemas
+│   │   └── services/         # Business logic (AI, metrics, duplicate, IO)
+│   ├── tests/                # Automated pytest suite (46 tests)
 │   ├── requirements.txt
 │   └── run.py
-├── public/
-├── src/
-│   ├── components/
-│   │   ├── common/           # Toast, Badge, Modal, ConfirmDialog
-│   │   ├── layout/           # Header, Sidebar, Layout
-│   │   ├── leads/            # LeadFormModal, LeadDetailModal
-│   │   └── pipeline/         # KanbanColumn, KanbanCard
-│   ├── context/
-│   │   └── CRMContext.jsx    # Central state provider with live backend integration
-│   ├── pages/
-│   │   ├── DashboardPage.jsx
-│   │   ├── LeadsPage.jsx     # Table view with CSV Import / Export
-│   │   ├── PipelinePage.jsx  # Interactive Kanban board
-│   │   ├── ClientsPage.jsx
-│   │   ├── FollowUpsPage.jsx
-│   │   └── ActivitiesPage.jsx
-│   │   ├── services/api.js   # Unified HTTP REST API client
-│   │   ├── services/dataService.js # LocalStorage fallback store
-│   │   └── services/mockData.js    # Pipeline stages, priorities, sources metadata
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── test_crm_service.js       # Frontend Node verification suite
-├── package.json
+├── frontend/
+│   ├── public/               # Belvo logo assets, favicon, static icons
+│   ├── src/
+│   │   ├── components/       # Common, layout, leads, pipeline, CommandPalette
+│   │   ├── context/          # Central CRM context & state provider
+│   │   ├── pages/            # Dashboard, Leads, Kanban, Clients, Tasks
+│   │   ├── services/         # HTTP REST API client & state models
+│   │   ├── App.jsx
+│   │   ├── index.css         # Glassmorphism tokens & animations
+│   │   └── main.jsx
+│   ├── index.html            # Single page app entry with Belvo favicon
+│   ├── package.json          # Frontend dependencies (React 19, Lucide, Vite)
+│   ├── test_crm_service.js   # 26 frontend verification tests
+│   └── vite.config.js        # Vite compilation configuration
+├── Dockerfile                # Production multi-stage Docker build
+├── docker-compose.yml        # Multi-container production compose
+├── DEPLOYMENT.md             # Production deployment guide
+├── verify_4_weeks_e2e.py     # 16-suite End-to-End verification
+├── package.json              # Root workspace delegation
 └── README.md
 ```
