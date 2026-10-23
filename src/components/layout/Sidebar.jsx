@@ -12,11 +12,12 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  UserCog
+  UserCog,
+  Command
 } from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
-export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
+export const Sidebar = ({ isCollapsed, setIsCollapsed, onOpenCommandPalette }) => {
   const { metrics, refreshData, backendConnected } = useCRM();
 
   const navSections = [
@@ -47,7 +48,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       ]
     },
     {
-      title: 'Activities & Audit',
+      title: 'Activities & Tasks',
       items: [
         {
           label: 'Follow-ups',
@@ -183,6 +184,43 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
 
       {/* Navigation Sections */}
       <nav style={{ flex: 1, padding: isCollapsed ? '12px 6px' : '16px 10px', overflowY: 'auto' }}>
+        {/* Quick Command Trigger in Sidebar */}
+        {!isCollapsed && onOpenCommandPalette && (
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 12px',
+              backgroundColor: 'rgba(30, 41, 59, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: 8,
+              color: '#94a3b8',
+              fontSize: '0.78rem',
+              cursor: 'pointer',
+              marginBottom: 16,
+              transition: 'all 0.15s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.8)';
+              e.currentTarget.style.color = '#ffffff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.45)';
+              e.currentTarget.style.color = '#94a3b8';
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Command size={14} color="#38bdf8" />
+              <span>Command Menu</span>
+            </div>
+            <span style={{ fontSize: '0.65rem', padding: '1px 5px', borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.1)', color: '#cbd5e1' }}>⌘K</span>
+          </button>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {navSections.map((sec) => (
             <div key={sec.title}>
@@ -253,11 +291,11 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           ))}
         </div>
 
-        {/* AI & Intelligence Teaser */}
+        {/* Agency Workflow Badge */}
         {!isCollapsed && (
           <div
             style={{
-              marginTop: 24,
+              marginTop: 22,
               padding: '12px 14px',
               backgroundColor: 'rgba(30, 27, 75, 0.4)',
               borderRadius: 10,
@@ -266,10 +304,10 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#c084fc', fontSize: '0.75rem', fontWeight: 700, marginBottom: 4 }}>
               <Sparkles size={14} />
-              AI Lead Engine
+              Agency Growth Engine
             </div>
-            <p style={{ color: '#94a3b8', fontSize: '0.7rem', lineHeight: 1.4, margin: 0 }}>
-              Scoring models, predictive conversion win rates & next-best actions.
+            <p style={{ color: '#94a3b8', fontSize: '0.68rem', lineHeight: 1.4, margin: '0 0 6px 0' }}>
+              Discover → Design → Develop → Deliver. Scaling brands from scratch.
             </p>
           </div>
         )}
@@ -287,7 +325,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                System Sync
+                System Status
               </span>
               <span
                 style={{
@@ -303,7 +341,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 }}
               >
                 <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: backendConnected ? '#10b981' : '#38bdf8' }} />
-                {backendConnected ? "Live API" : "Local Sync"}
+                {backendConnected ? "FastAPI Live" : "Local Sync"}
               </span>
             </div>
             <button

@@ -623,7 +623,7 @@ export const LeadDetailModal = ({
                     <div style={{ height: '100%', width: `${winProbability}%`, backgroundColor: '#10b981', borderRadius: 999 }} />
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#065f46' }}>
-                    Calibrated on deal size (${(lead.expectedValue || 0).toLocaleString()}) and LatAm fintech velocity.
+                    Calibrated on deal size (${(lead.expectedValue || 0).toLocaleString()}) and agency engagement velocity.
                   </div>
                 </div>
               </div>

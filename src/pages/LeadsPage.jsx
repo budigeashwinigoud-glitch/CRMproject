@@ -181,7 +181,7 @@ export const LeadsPage = () => {
             </span>
           </h1>
           <p className="page-subtitle">
-            Manage prospective fintech accounts, pipeline progression, and lead ownership.
+            Manage prospective brand accounts, creative campaigns, and lead ownership.
           </p>
         </div>
 

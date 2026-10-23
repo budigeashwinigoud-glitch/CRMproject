@@ -268,7 +268,7 @@ export const LeadDetailPage = () => {
                 </span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#5b21b6', lineHeight: 1.5 }}>
-                {lead.aiSummary || 'High propensity to close based on enterprise fintech engagement signals.'}
+                {lead.aiSummary || 'High propensity to close based on creative agency engagement and brand scope requirements.'}
               </p>
               <div style={{ fontSize: '0.72rem', color: '#7c3aed', marginTop: 10, fontStyle: 'italic' }}>
                 * Integration ready for AI/ML teammate lead scoring models

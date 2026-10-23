@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
-export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
+export const Header = ({ onOpenAddLead, onToggleMobileSidebar, onOpenCommandPalette }) => {
   const navigate = useNavigate();
   const { followUps, backendConnected, setCurrentUser, currentUser } = useCRM();
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,12 +31,16 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        if (onOpenCommandPalette) {
+          onOpenCommandPalette();
+        } else {
+          searchInputRef.current?.focus();
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [onOpenCommandPalette]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -105,7 +109,18 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
           </button>
         )}
 
-        <form onSubmit={handleSearchSubmit} style={{ width: '100%', position: 'relative' }}>
+        <div
+          onClick={() => onOpenCommandPalette ? onOpenCommandPalette() : navigate('/leads')}
+          style={{ width: '100%', position: 'relative', cursor: 'pointer' }}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onOpenCommandPalette ? onOpenCommandPalette() : navigate('/leads');
+            }
+          }}
+        >
           <Search
             size={16}
             style={{
@@ -117,12 +132,10 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             }}
           />
           <input
-            ref={searchInputRef}
             id="global-search-input"
             type="text"
-            placeholder="Search leads, accounts, emails... (Press Ctrl+K)"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            readOnly
+            placeholder="Quick search leads, pages, or commands (Press Ctrl+K)..."
             style={{
               width: '100%',
               padding: '9px 72px 9px 38px',
@@ -131,18 +144,9 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
               border: '1px solid #e2e8f0',
               borderRadius: 'var(--radius-md)',
               outline: 'none',
+              cursor: 'pointer',
               transition: 'all 0.15s ease',
               boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.02)'
-            }}
-            onFocus={(e) => {
-              e.target.style.backgroundColor = '#ffffff';
-              e.target.style.borderColor = '#2563eb';
-              e.target.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.12)';
-            }}
-            onBlur={(e) => {
-              e.target.style.backgroundColor = '#f8fafc';
-              e.target.style.borderColor = '#e2e8f0';
-              e.target.style.boxShadow = 'inset 0 1px 2px rgba(0,0,0,0.02)';
             }}
           />
           <span
@@ -164,7 +168,7 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
           >
             ⌘K
           </span>
-        </form>
+        </div>
       </div>
 
       {/* Right: Actions, Notifications & Profile */}

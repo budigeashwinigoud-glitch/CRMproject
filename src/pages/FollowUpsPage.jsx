@@ -142,7 +142,7 @@ React.useEffect(() => {
             )}
           </h1>
           <p className="page-subtitle">
-            Schedule calls, demos, and contract reviews linked directly to client accounts.
+            Schedule discovery calls, brand strategy reviews, creative briefs, and campaign deliverables.
           </p>
         </div>
 

@@ -167,7 +167,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
               name="company"
               type="text"
               className={`form-input ${errors.company ? 'error' : ''}`}
-              placeholder="e.g. Nubank Brasil"
+              placeholder="e.g. Acme Studio / Horizon Brand"
               value={formData.company}
               onChange={handleChange}
             />
@@ -185,7 +185,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
               name="email"
               type="email"
               className={`form-input ${errors.email ? 'error' : ''}`}
-              placeholder="rodrigo@company.com"
+              placeholder="sarah@brand.com"
               value={formData.email}
               onChange={handleChange}
             />
@@ -201,7 +201,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
               name="phone"
               type="tel"
               className={`form-input ${errors.phone ? 'error' : ''}`}
-              placeholder="+55 11 98765-4321"
+              placeholder="+1 (555) 019-2834"
               value={formData.phone}
               onChange={handleChange}
             />

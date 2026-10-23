@@ -58,10 +58,10 @@ export const DashboardPage = () => {
     const wonVal = leads.filter(l => wonStages.includes(l.pipelineStage)).reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
 
     return [
-      { id: 'discovery', label: '1. Discovery & Outreach', count: discoveryCount, value: discoveryVal, color: '#38bdf8' },
-      { id: 'qualification', label: '2. Demo & Technical Fit', count: qualificationCount, value: qualificationVal, color: '#6366f1' },
-      { id: 'proposal', label: '3. Proposal & Negotiation', count: proposalCount, value: proposalVal, color: '#a855f7' },
-      { id: 'won', label: '4. Closed Won Revenue', count: wonCount, value: wonVal, color: '#10b981' }
+      { id: 'discovery', label: '1. Discovery & Creative Brief', count: discoveryCount, value: discoveryVal, color: '#38bdf8' },
+      { id: 'qualification', label: '2. Strategy & Pitch', count: qualificationCount, value: qualificationVal, color: '#6366f1' },
+      { id: 'proposal', label: '3. Proposal & Scope Review', count: proposalCount, value: proposalVal, color: '#a855f7' },
+      { id: 'won', label: '4. Closed Won Campaigns', count: wonCount, value: wonVal, color: '#10b981' }
     ];
   }, [leads]);
 
@@ -161,7 +161,7 @@ export const DashboardPage = () => {
               Zero-clutter workspace ready for client pipeline
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.5, margin: 0 }}>
-              No hardcoded mock companies or dummy leads. Add your first fintech lead directly or import your existing records via Excel or CSV.
+              No hardcoded mock companies or dummy leads. Add your first brand lead directly or import your existing records via Excel or CSV.
             </p>
           </div>
 

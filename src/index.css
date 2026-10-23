@@ -633,3 +633,23 @@ a {
   }
 }
 
+
+
+/* Liquidomorphism & Glassmorphism Utilities */
+.hover-row {
+  transition: background-color 0.15s ease;
+}
+.hover-row:hover {
+  background-color: #f8fafc !important;
+}
+
+.glass-surface {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.liquid-accent-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #db2777 100%);
+}
