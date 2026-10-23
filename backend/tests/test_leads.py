@@ -22,7 +22,7 @@ def test_create_lead_full_lifecycle(client, admin_token):
         "leadCategory": "Digital Banking",
         "priority": "High",
         "pipelineStage": "Qualified",
-        "assignedEmployee": "Ashwini Sharma",
+        "assignedEmployee": "Pavan Kumar",
         "expectedValue": 95000,
         "notes": "Looking to integrate automated income verification.",
         "nextFollowUpDate": "2026-10-28",

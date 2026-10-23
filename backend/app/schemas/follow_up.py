@@ -13,7 +13,7 @@ class FollowUpBase(BaseModel):
     due_time: Optional[str] = Field("10:00", alias="dueTime")
     priority: Optional[str] = "Medium"
     status: Optional[str] = "Pending"  # 'Pending', 'Completed', 'Overdue'
-    assigned_employee: Optional[str] = Field("Ashwini Sharma", alias="assignedEmployee")
+    assigned_employee: Optional[str] = Field("Pavan Kumar", alias="assignedEmployee")
     assigned_user_id: Optional[int] = Field(None, alias="assignedUserId")
     notes: Optional[str] = ""
 
@@ -55,7 +55,7 @@ class FollowUpResponse(BaseModel):
     dueTime: Optional[str] = "10:00"
     priority: Optional[str] = "Medium"
     status: Optional[str] = "Pending"
-    assignedEmployee: Optional[str] = "Ashwini Sharma"
+    assignedEmployee: Optional[str] = "Pavan Kumar"
     assignedUserId: Optional[int] = None
     notes: Optional[str] = ""
     completedAt: Optional[datetime] = None
@@ -73,7 +73,7 @@ class FollowUpResponse(BaseModel):
             dueTime=fu.due_time or "10:00",
             priority=fu.priority or "Medium",
             status=fu.status or "Pending",
-            assignedEmployee=fu.assigned_employee or "Ashwini Sharma",
+            assignedEmployee=fu.assigned_employee or "Pavan Kumar",
             assignedUserId=fu.assigned_user_id,
             notes=fu.notes or "",
             completedAt=fu.completed_at

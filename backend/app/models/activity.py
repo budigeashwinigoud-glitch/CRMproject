@@ -14,7 +14,7 @@ class Activity(Base):
     type = Column(String(50), default="note")  # 'stage_change', 'note', 'lead_created', 'email', 'task'
     description = Column(Text, nullable=False)
     timestamp = Column(String(30), nullable=True)  # 'YYYY-MM-DD HH:MM'
-    performed_by = Column(String(100), default="Ashwini Sharma")
+    performed_by = Column(String(100), default="Pavan Kumar")
     created_at = Column(DateTime, server_default=func.now())
 
     # Relationships

@@ -9,7 +9,7 @@ class WebsiteLeadWebhookPayload(BaseModel):
     phone: Optional[str] = ""
     leadSource: Optional[str] = "Website"
     notes: Optional[str] = ""
-    assignedEmployee: Optional[str] = "Ashwini Sharma"
+    assignedEmployee: Optional[str] = "Pavan Kumar"
 
     class Config:
         populate_by_name = True
@@ -55,7 +55,7 @@ class CalendarSyncEventRequest(BaseModel):
     startTime: str  # ISO string or YYYY-MM-DD HH:MM
     durationMinutes: int = 45
     attendeeEmail: EmailStr
-    assignedEmployee: Optional[str] = "Ashwini Sharma"
+    assignedEmployee: Optional[str] = "Pavan Kumar"
 
 
 class CalendarSyncEventResponse(BaseModel):

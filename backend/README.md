@@ -118,7 +118,7 @@ python -m alembic upgrade head
 
 The frontend seamlessly bridges to this FastAPI backend:
 - **Auto-Bootstrapping**: On initial visit, if a healthy backend is detected, the frontend auto-authenticates with the default demo account, establishes a secure JWT bearer session, and populates live database records.
-- **Interactive Role Switcher**: Click the user profile in the navigation header to switch live between **Ashwini Sharma (Employee)** and **CRM Administrator (Admin)**. This immediately demonstrates:
-  - Employee lead portfolio isolation (Ashwini only sees assigned leads: Nubank, Clip, Mercado Pago).
+- **Interactive Role Switcher**: Click the user profile in the navigation header to switch live between **Pavan Kumar (Employee)** and **CRM Administrator (Admin)**. This immediately demonstrates:
+  - Employee lead portfolio isolation (Pavan only sees assigned leads: Nubank, Clip, Mercado Pago).
   - Admin team-wide oversight (full pipeline view and lead reassignment permissions).
 - **Authenticated File Downloads**: Exports (`GET /api/export/leads`) are triggered using authenticated token blobs for clean, secure CSV and Excel downloads.

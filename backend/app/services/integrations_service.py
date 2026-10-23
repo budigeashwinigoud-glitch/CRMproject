@@ -83,11 +83,11 @@ def process_website_lead_form(db: Session, payload: WebsiteLeadWebhookPayload) -
             }
 
     # Safe default assignment: ensure target employee is active, else fallback to primary employee
-    assigned_name = payload.assignedEmployee or "Ashwini Sharma"
+    assigned_name = payload.assignedEmployee or "Pavan Kumar"
     target_user = db.query(User).filter(User.full_name == assigned_name, User.is_active == True).first()
     if not target_user:
         active_emp = db.query(User).filter(User.role == "EMPLOYEE", User.is_active == True).first()
-        assigned_name = active_emp.full_name if active_emp else "Ashwini Sharma"
+        assigned_name = active_emp.full_name if active_emp else "Pavan Kumar"
 
     lead_in = LeadCreate(
         fullName=payload.fullName,
@@ -154,7 +154,7 @@ def process_meta_lead_ad(
 
     # Check active employee for assignment
     active_emp = db.query(User).filter(User.role == "EMPLOYEE", User.is_active == True).first()
-    assigned_name = active_emp.full_name if active_emp else "Ashwini Sharma"
+    assigned_name = active_emp.full_name if active_emp else "Pavan Kumar"
 
     lead_in = LeadCreate(
         fullName=full_name,
@@ -219,7 +219,7 @@ def process_whatsapp_inbound_message(db: Session, sender: str, text: str, msg_id
         }
     else:
         active_emp = db.query(User).filter(User.role == "EMPLOYEE", User.is_active == True).first()
-        assigned_name = active_emp.full_name if active_emp else "Ashwini Sharma"
+        assigned_name = active_emp.full_name if active_emp else "Pavan Kumar"
         lead_in = LeadCreate(
             fullName=f"WhatsApp Contact ({sender[-4:] if len(sender) >= 4 else sender})",
             company="Inbound WhatsApp Prospect",

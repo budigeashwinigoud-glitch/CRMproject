@@ -31,7 +31,7 @@ export const LEAD_SOURCES = [
 export const PRIORITIES = ['High', 'Medium', 'Low'];
 
 export const EMPLOYEES = [
-  'Ashwini Sharma',
+  'Pavan Kumar',
   'Carlos Mendes',
   'Mariana Silva',
   'Alex Rivera'

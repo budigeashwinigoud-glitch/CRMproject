@@ -75,7 +75,7 @@ def get_leads(
     return leads, total_count
 
 
-def create_lead(db: Session, lead_in: LeadCreate, performed_by: str = "Ashwini Sharma") -> Lead:
+def create_lead(db: Session, lead_in: LeadCreate, performed_by: str = "Pavan Kumar") -> Lead:
     new_id = generate_lead_id()
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -89,7 +89,7 @@ def create_lead(db: Session, lead_in: LeadCreate, performed_by: str = "Ashwini S
         lead_category=lead_in.lead_category or "Enterprise Banking",
         priority=lead_in.priority or "Medium",
         pipeline_stage=lead_in.pipeline_stage or "New",
-        assigned_employee=lead_in.assigned_employee or "Ashwini Sharma",
+        assigned_employee=lead_in.assigned_employee or "Pavan Kumar",
         assigned_user_id=lead_in.assigned_user_id,
         expected_value=float(lead_in.expected_value or 0.0),
         currency=lead_in.currency or "USD",
@@ -132,7 +132,7 @@ def create_lead(db: Session, lead_in: LeadCreate, performed_by: str = "Ashwini S
             due_time="10:00",
             priority=lead.priority or "Medium",
             status="Pending",
-            assigned_employee=lead.assigned_employee or "Ashwini Sharma",
+            assigned_employee=lead.assigned_employee or "Pavan Kumar",
             assigned_user_id=lead.assigned_user_id,
             notes=f"Follow up regarding: {lead.notes or 'Initial inquiry'}"
         )
@@ -143,7 +143,7 @@ def create_lead(db: Session, lead_in: LeadCreate, performed_by: str = "Ashwini S
     return lead
 
 
-def update_lead(db: Session, lead: Lead, lead_in: LeadUpdate, performed_by: str = "Ashwini Sharma") -> Lead:
+def update_lead(db: Session, lead: Lead, lead_in: LeadUpdate, performed_by: str = "Pavan Kumar") -> Lead:
     previous_stage = lead.pipeline_stage
 
     update_data = lead_in.model_dump(exclude_unset=True, by_alias=False)
@@ -184,7 +184,7 @@ def update_lead(db: Session, lead: Lead, lead_in: LeadUpdate, performed_by: str 
     return lead
 
 
-def update_lead_stage(db: Session, lead: Lead, new_stage: str, performed_by: str = "Ashwini Sharma") -> Lead:
+def update_lead_stage(db: Session, lead: Lead, new_stage: str, performed_by: str = "Pavan Kumar") -> Lead:
     old_stage = lead.pipeline_stage
     if old_stage == new_stage:
         return lead
@@ -222,7 +222,7 @@ def update_lead_stage(db: Session, lead: Lead, new_stage: str, performed_by: str
     return lead
 
 
-def archive_lead(db: Session, lead: Lead, performed_by: str = "Ashwini Sharma") -> Lead:
+def archive_lead(db: Session, lead: Lead, performed_by: str = "Pavan Kumar") -> Lead:
     lead.is_archived = True
     lead.archived_at = datetime.now(timezone.utc)
 
@@ -249,7 +249,7 @@ def archive_lead(db: Session, lead: Lead, performed_by: str = "Ashwini Sharma") 
     return lead
 
 
-def restore_lead(db: Session, lead: Lead, performed_by: str = "Ashwini Sharma") -> Lead:
+def restore_lead(db: Session, lead: Lead, performed_by: str = "Pavan Kumar") -> Lead:
     lead.is_archived = False
     lead.archived_at = None
 

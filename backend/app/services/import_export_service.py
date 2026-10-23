@@ -54,7 +54,7 @@ def process_lead_import(
     raw_rows: List[Dict[str, Any]],
     dry_run: bool = False,
     update_duplicates: bool = False,
-    performed_by: str = "Ashwini Sharma"
+    performed_by: str = "Pavan Kumar"
 ) -> ImportReport:
     total_rows = len(raw_rows)
     inserted = 0

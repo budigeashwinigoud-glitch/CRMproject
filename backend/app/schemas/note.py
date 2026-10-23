@@ -5,7 +5,7 @@ from datetime import datetime
 
 class NoteCreate(BaseModel):
     content: str
-    author_name: Optional[str] = Field("Ashwini Sharma", alias="authorName")
+    author_name: Optional[str] = Field("Pavan Kumar", alias="authorName")
 
     class Config:
         populate_by_name = True

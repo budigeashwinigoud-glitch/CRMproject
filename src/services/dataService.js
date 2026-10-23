@@ -72,7 +72,7 @@ export const dataService = {
       leadCategory: leadData.leadCategory || 'General',
       priority: leadData.priority || 'Medium',
       pipelineStage: leadData.pipelineStage || 'New',
-      assignedEmployee: leadData.assignedEmployee || 'Ashwini Sharma',
+      assignedEmployee: leadData.assignedEmployee || 'Pavan Kumar',
       expectedValue: Number(leadData.expectedValue) || 0,
       notes: leadData.notes || '',
       createdDate: leadData.createdDate || today,
@@ -145,7 +145,7 @@ export const dataService = {
         company: updatedLead.company,
         type: 'stage_change',
         description: `Stage moved from ${previousStage} → ${updatedLead.pipelineStage} ($${(updatedLead.expectedValue || 0).toLocaleString()})`,
-        performedBy: updatedLead.assignedEmployee || 'Ashwini Sharma'
+        performedBy: updatedLead.assignedEmployee || 'Pavan Kumar'
       });
     } else {
       dataService.createActivity({
@@ -154,7 +154,7 @@ export const dataService = {
         company: updatedLead.company,
         type: 'note',
         description: `Lead profile updated for ${updatedLead.company}`,
-        performedBy: updatedLead.assignedEmployee || 'Ashwini Sharma'
+        performedBy: updatedLead.assignedEmployee || 'Pavan Kumar'
       });
     }
 
@@ -178,7 +178,7 @@ export const dataService = {
       company: lead.company,
       type: 'stage_change',
       description: `Pipeline stage updated: ${oldStage} → ${newStage}`,
-      performedBy: lead.assignedEmployee || 'Ashwini Sharma'
+      performedBy: lead.assignedEmployee || 'Pavan Kumar'
     });
 
     return lead;
@@ -202,7 +202,7 @@ export const dataService = {
         company: leadToDelete.company,
         type: 'note',
         description: `Lead record for ${leadToDelete.company} was archived/deleted.`,
-        performedBy: 'Ashwini Sharma'
+        performedBy: 'Pavan Kumar'
       });
     }
 
@@ -229,7 +229,7 @@ export const dataService = {
       dueTime: followUpData.dueTime || '10:00',
       priority: followUpData.priority || 'Medium',
       status: followUpData.status || 'Pending',
-      assignedEmployee: followUpData.assignedEmployee || 'Ashwini Sharma',
+      assignedEmployee: followUpData.assignedEmployee || 'Pavan Kumar',
       notes: followUpData.notes || ''
     };
 
@@ -262,7 +262,7 @@ export const dataService = {
       company: item.company,
       type: 'task',
       description: `Follow-up "${item.title}" marked as ${newStatus}`,
-      performedBy: item.assignedEmployee || 'Ashwini Sharma'
+      performedBy: item.assignedEmployee || 'Pavan Kumar'
     });
 
     return item;
@@ -293,7 +293,7 @@ export const dataService = {
       type: activityData.type || 'note',
       description: activityData.description || '',
       timestamp: activityData.timestamp || timestamp,
-      performedBy: activityData.performedBy || 'Ashwini Sharma'
+      performedBy: activityData.performedBy || 'Pavan Kumar'
     };
 
     const updated = [newActivity, ...activities];

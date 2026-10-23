@@ -12,7 +12,7 @@ class LeadBase(BaseModel):
     lead_category: Optional[str] = Field("Enterprise Banking", alias="leadCategory")
     priority: Optional[str] = "Medium"
     pipeline_stage: Optional[str] = Field("New", alias="pipelineStage")
-    assigned_employee: Optional[str] = Field("Ashwini Sharma", alias="assignedEmployee")
+    assigned_employee: Optional[str] = Field("Pavan Kumar", alias="assignedEmployee")
     assigned_user_id: Optional[int] = Field(None, alias="assignedUserId")
     expected_value: Optional[float] = Field(0.0, alias="expectedValue")
     currency: Optional[str] = "USD"
@@ -37,7 +37,7 @@ class LeadCreate(BaseModel):
     lead_category: Optional[str] = Field("Enterprise Banking", alias="leadCategory")
     priority: Optional[str] = "Medium"
     pipeline_stage: Optional[str] = Field("New", alias="pipelineStage")
-    assigned_employee: Optional[str] = Field("Ashwini Sharma", alias="assignedEmployee")
+    assigned_employee: Optional[str] = Field("Pavan Kumar", alias="assignedEmployee")
     assigned_user_id: Optional[int] = Field(None, alias="assignedUserId")
     expected_value: Optional[float] = Field(0.0, alias="expectedValue")
     currency: Optional[str] = "USD"
@@ -99,7 +99,7 @@ class LeadResponse(BaseModel):
     leadCategory: Optional[str] = "Enterprise Banking"
     priority: Optional[str] = "Medium"
     pipelineStage: Optional[str] = "New"
-    assignedEmployee: Optional[str] = "Ashwini Sharma"
+    assignedEmployee: Optional[str] = "Pavan Kumar"
     assignedUserId: Optional[int] = None
     expectedValue: Optional[float] = 0.0
     currency: Optional[str] = "USD"
@@ -125,7 +125,7 @@ class LeadResponse(BaseModel):
             leadCategory=lead.lead_category or "Enterprise Banking",
             priority=lead.priority or "Medium",
             pipelineStage=lead.pipeline_stage or "New",
-            assignedEmployee=lead.assigned_employee or "Ashwini Sharma",
+            assignedEmployee=lead.assigned_employee or "Pavan Kumar",
             assignedUserId=lead.assigned_user_id,
             expectedValue=lead.expected_value or 0.0,
             currency=lead.currency or "USD",

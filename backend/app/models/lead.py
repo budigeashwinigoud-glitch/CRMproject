@@ -16,7 +16,7 @@ class Lead(Base):
     priority = Column(String(20), default="Medium", index=True)
     pipeline_stage = Column(String(50), ForeignKey("pipeline_stages.id"), default="New", index=True)
     
-    assigned_employee = Column(String(100), default="Ashwini Sharma", index=True)
+    assigned_employee = Column(String(100), default="Pavan Kumar", index=True)
     assigned_user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     
     expected_value = Column(Float, default=0.0)

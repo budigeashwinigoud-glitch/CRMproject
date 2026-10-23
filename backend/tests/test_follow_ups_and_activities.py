@@ -13,7 +13,7 @@ def test_follow_ups_crud_and_completion(client, admin_token):
         "dueDate": "2026-10-30",
         "dueTime": "14:00",
         "priority": "High",
-        "assignedEmployee": "Ashwini Sharma",
+        "assignedEmployee": "Pavan Kumar",
         "notes": "Bring legal counsel"
     }
     create_res = client.post("/api/follow-ups", json=new_fu_payload, headers=headers)
@@ -54,7 +54,7 @@ def test_activities_logging_and_filtering(client, admin_token):
         "leadId": "LEAD-103",
         "type": "email",
         "description": "Sent updated technical integration manual.",
-        "performedBy": "Ashwini Sharma"
+        "performedBy": "Pavan Kumar"
     }
     post_res = client.post("/api/activities", json=act_payload, headers=headers)
     assert post_res.status_code == 201

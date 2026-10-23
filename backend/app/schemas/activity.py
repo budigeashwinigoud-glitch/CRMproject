@@ -9,7 +9,7 @@ class ActivityBase(BaseModel):
     type: Optional[str] = "note"
     description: str
     timestamp: Optional[str] = None
-    performed_by: Optional[str] = Field("Ashwini Sharma", alias="performedBy")
+    performed_by: Optional[str] = Field("Pavan Kumar", alias="performedBy")
 
     class Config:
         populate_by_name = True
@@ -39,7 +39,7 @@ class ActivityResponse(BaseModel):
             type=act.type or "note",
             description=act.description,
             timestamp=act.timestamp or "",
-            performedBy=act.performed_by or "Ashwini Sharma"
+            performedBy=act.performed_by or "Pavan Kumar"
         )
 
     class Config:

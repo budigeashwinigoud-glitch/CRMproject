@@ -84,7 +84,7 @@ def test_employee_cannot_access_unassigned_notes_or_ai(client, employee_token):
     """
     headers = {"Authorization": f"Bearer {employee_token}"}
     
-    # LEAD-102 is assigned to Carlos Mendes, while employee_token is Ashwini Sharma
+    # LEAD-102 is assigned to Carlos Mendes, while employee_token is Pavan Kumar
     res_notes = client.get("/api/leads/LEAD-102/notes", headers=headers)
     assert res_notes.status_code == 403
     assert "access forbidden" in res_notes.json()["detail"].lower()
@@ -152,8 +152,8 @@ def test_admin_can_reassign_lead_to_valid_user(client, admin_token):
     assert res.status_code == 200
     assert res.json()["assignedEmployee"] == "Carlos Mendes"
 
-    # Reset assignment back to Ashwini Sharma
-    client.patch("/api/leads/LEAD-101/assignment", json={"assignedEmployee": "Ashwini Sharma"}, headers=headers)
+    # Reset assignment back to Pavan Kumar
+    client.patch("/api/leads/LEAD-101/assignment", json={"assignedEmployee": "Pavan Kumar"}, headers=headers)
 
 
 def test_reassign_to_invalid_user_rejected(client, admin_token):

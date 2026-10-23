@@ -307,7 +307,7 @@ function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => fillCredentials('ashwini@belvo.com', 'Ashwini@12345')}
+                onClick={() => fillCredentials('pavan@belvo.com', 'Pavan@12345')}
                 style={{
                   padding: '8px 10px',
                   backgroundColor: '#f8fafc',
@@ -330,7 +330,7 @@ function LoginPage() {
                   👤 Employee
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
-                  ashwini@belvo.com
+                  pavan@belvo.com
                 </div>
               </button>
             </div>

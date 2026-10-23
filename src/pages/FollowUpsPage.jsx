@@ -42,7 +42,7 @@ export const FollowUpsPage = () => {
     dueDate: today,
     dueTime: '10:00',
     priority: 'Medium',
-    assignedEmployee: 'Ashwini Sharma',
+    assignedEmployee: 'Pavan Kumar',
     notes: ''
   });
 
@@ -108,7 +108,7 @@ React.useEffect(() => {
       dueDate: today,
       dueTime: '10:00',
       priority: 'Medium',
-      assignedEmployee: 'Ashwini Sharma',
+      assignedEmployee: 'Pavan Kumar',
       notes: ''
     });
   };

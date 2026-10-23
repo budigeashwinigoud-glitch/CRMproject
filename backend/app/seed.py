@@ -25,7 +25,7 @@ DEFAULT_STAGES = [
 
 DEFAULT_USERS = [
     {"full_name": "CRM Administrator", "email": "admin@belvo.com", "password": "Admin@12345", "role": "ADMIN"},
-    {"full_name": "Ashwini Sharma", "email": "ashwini@belvo.com", "password": "Ashwini@12345", "role": "EMPLOYEE"},
+    {"full_name": "Pavan Kumar", "email": "pavan@belvo.com", "password": "Pavan@12345", "role": "EMPLOYEE"},
     {"full_name": "Carlos Mendes", "email": "carlos@belvo.com", "password": "Carlos@12345", "role": "EMPLOYEE"},
     {"full_name": "Mariana Silva", "email": "mariana@belvo.com", "password": "Mariana@12345", "role": "EMPLOYEE"},
     {"full_name": "Alex Rivera", "email": "alex@belvo.com", "password": "Alex@12345", "role": "EMPLOYEE"},
@@ -42,7 +42,7 @@ INITIAL_LEADS_DATA = [
         "lead_category": "Enterprise Banking",
         "priority": "High",
         "pipeline_stage": "Negotiation",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "expected_value": 85000.0,
         "notes": "Evaluating Open Finance data aggregation API for 2M+ active credit card users. Final security review in progress.",
         "created_date": "2026-09-12",
@@ -82,7 +82,7 @@ INITIAL_LEADS_DATA = [
         "lead_category": "Auto Financing",
         "priority": "Medium",
         "pipeline_stage": "Meeting",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "expected_value": 45000.0,
         "notes": "Discovery call completed. Technical deep-dive scheduled with their underwriting risk team next Tuesday.",
         "created_date": "2026-09-25",
@@ -142,7 +142,7 @@ INITIAL_LEADS_DATA = [
         "lead_category": "SuperApp / Digital Wallet",
         "priority": "High",
         "pipeline_stage": "Contacted",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "expected_value": 75000.0,
         "notes": "Initial outreach connected. Sent overview presentation and requested an intro with Head of Product.",
         "created_date": "2026-10-04",
@@ -222,7 +222,7 @@ INITIAL_LEADS_DATA = [
         "lead_category": "Digital Banking",
         "priority": "Medium",
         "pipeline_stage": "Qualified",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "expected_value": 41000.0,
         "notes": "Passed initial compliance checklist. Wants sample sandbox access for developer team testing.",
         "created_date": "2026-09-29",
@@ -246,7 +246,7 @@ INITIAL_FOLLOW_UPS_DATA = [
         "due_time": "11:00",
         "priority": "High",
         "status": "Overdue",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "notes": "Check if Head of Product received the Belvo API LatAm benchmark document."
     },
     {
@@ -260,7 +260,7 @@ INITIAL_FOLLOW_UPS_DATA = [
         "due_time": "15:30",
         "priority": "High",
         "status": "Pending",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "notes": "Prepare sandbox demo for bank transaction aggregation and payroll parsing."
     },
     {
@@ -316,7 +316,7 @@ INITIAL_FOLLOW_UPS_DATA = [
         "due_time": "11:00",
         "priority": "High",
         "status": "Pending",
-        "assigned_employee": "Ashwini Sharma",
+        "assigned_employee": "Pavan Kumar",
         "notes": "Confirm ISO 27001 / SOC2 audit reports and Brazilian LGPD compliance documentation."
     },
     {
@@ -354,7 +354,7 @@ INITIAL_ACTIVITIES_DATA = [
         "type": "note",
         "description": "Updated enterprise pricing parameters for Brazil Open Finance integration.",
         "timestamp": "2026-10-08 14:15",
-        "performed_by": "Ashwini Sharma"
+        "performed_by": "Pavan Kumar"
     },
     {
         "id": "ACT-303",
@@ -374,7 +374,7 @@ INITIAL_ACTIVITIES_DATA = [
         "type": "email",
         "description": "Sent LatAm API case study and scheduled discovery outreach.",
         "timestamp": "2026-10-06 16:45",
-        "performed_by": "Ashwini Sharma"
+        "performed_by": "Pavan Kumar"
     },
     {
         "id": "ACT-305",

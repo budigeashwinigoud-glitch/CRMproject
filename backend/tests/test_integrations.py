@@ -20,7 +20,7 @@ def test_website_webhook_ingestion(client):
         "phone": "+52 55 9876 5432",
         "company": "LatAm Fin Co",
         "notes": "Interested in Belvo account aggregation and transactions API",
-        "assignedEmployee": "Ashwini Sharma"
+        "assignedEmployee": "Pavan Kumar"
     }
     res = client.post("/api/integrations/webhooks/website", json=payload)
     assert res.status_code == 200
@@ -106,7 +106,7 @@ def test_calendar_and_email_sync(client, employee_token):
         "startTime": "2026-10-15 14:00",
         "durationMinutes": 60,
         "attendeeEmail": "tech@creditas.com",
-        "assignedEmployee": "Ashwini Sharma"
+        "assignedEmployee": "Pavan Kumar"
     }
     res_cal = client.post("/api/integrations/calendar/sync-event", json=cal_payload, headers=headers)
     assert res_cal.status_code == 200
@@ -117,7 +117,7 @@ def test_calendar_and_email_sync(client, employee_token):
     mail_payload = {
         "leadId": "LEAD-101",
         "subject": "Proposal Sent: Belvo API Contract 2026",
-        "fromEmail": "ashwini@belvo.com",
+        "fromEmail": "pavan@belvo.com",
         "toEmail": "commercial@creditas.com",
         "bodySnippet": "Attached please find the commercial terms and SLA details."
     }

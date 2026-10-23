@@ -87,17 +87,17 @@ A production-grade, secure, responsive B2B Open Finance CRM & Lead Intelligence 
 
 - **Password Hashing**: `bcrypt` with unique per-user salts.
 - **Token Security**: Signed HMAC-SHA256 JWT bearer tokens with 24-hour expiration.
-- **Interactive UI Role Switcher**: Click the user badge in the top navigation header to toggle between **Admin** (`admin@belvo.com`) and **Employee** (`ashwini@belvo.com` / `carlos@belvo.com`) to test live permissions, role restrictions, and employee lead isolation in real time.
+- **Interactive UI Role Switcher**: Click the user badge in the top navigation header to toggle between **Admin** (`admin@belvo.com`) and **Employee** (`pavan@belvo.com` / `carlos@belvo.com`) to test live permissions, role restrictions, and employee lead isolation in real time.
 
 ### Seeded Default Credentials (Development)
 - **Administrator**: `admin@belvo.com` / `Admin@12345` (Admin role, full team view)
-- **Employee 1**: `ashwini@belvo.com` / `Ashwini@12345` (Employee role)
+- **Employee 1**: `pavan@belvo.com` / `Pavan@12345` (Employee role)
 - **Employee 2**: `carlos@belvo.com` / `Carlos@12345` (Employee role)
 - **Employee 3**: `mariana@belvo.com` / `Mariana@12345` (Employee role)
 - **Employee 4**: `alex@belvo.com` / `Alex@12345` (Employee role)
 
 ### 🎨 Frontend UI / UX Highlights & Enhancements
-- **Dynamic Perspective Pill**: Executive Dashboard header immediately displays whether viewing an individual employee portfolio (`👤 Portfolio: Ashwini Sharma`) or the team-wide view (`👑 Team-wide View (Admin)`).
+- **Dynamic Perspective Pill**: Executive Dashboard header immediately displays whether viewing an individual employee portfolio (`👤 Portfolio: Pavan Kumar`) or the team-wide view (`👑 Team-wide View (Admin)`).
 - **One-Click Role Switcher**: Interactive popover in Header allows instant RBAC switching without manual token entry.
 - **Authenticated Blob Export**: One-click direct file download for CSV and Excel (.xlsx) exports using secure Bearer authentication tokens.
 - **Enhanced AI Lead Intelligence**: Client Profile displays composite `aiScore` (0–100), calibrated win probability percentage (`% Win Prob`), and model version provenance.
@@ -316,7 +316,7 @@ python -m pytest -v
   - Execute live Alembic migrations against the production PostgreSQL instance (`alembic upgrade head`).
   - Verify concurrent read/write transactions under multi-user access.
 - **End-to-End User Acceptance Testing (UAT)**:
-  - Multi-user browser testing: Verify simultaneously logging in as Admin (`admin@belvo.com`) in one browser window and Employee (`ashwini@belvo.com`) in an incognito window to verify real-time data isolation.
+  - Multi-user browser testing: Verify simultaneously logging in as Admin (`admin@belvo.com`) in one browser window and Employee (`pavan@belvo.com`) in an incognito window to verify real-time data isolation.
   - Test large spreadsheet uploads (1,000+ rows) via CSV/Excel bulk import to verify memory and timeout thresholds.
   - Verify exported CSV/Excel files open safely in Microsoft Excel and Google Sheets without formula injection security warnings.
 - **Mobile & Cross-Browser Responsiveness**:

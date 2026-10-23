@@ -69,6 +69,6 @@ def admin_token(client):
 
 @pytest.fixture
 def employee_token(client):
-    res = client.post("/api/auth/login", json={"email": "ashwini@belvo.com", "password": "Ashwini@12345"})
+    res = client.post("/api/auth/login", json={"email": "pavan@belvo.com", "password": "Pavan@12345"})
     assert res.status_code == 200
     return res.json()["access_token"]

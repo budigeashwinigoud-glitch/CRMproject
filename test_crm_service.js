@@ -53,7 +53,7 @@ const testLead = dataService.createLead({
   leadCategory: 'Secured Lending',
   priority: 'High',
   pipelineStage: 'Qualified',
-  assignedEmployee: 'Ashwini Sharma',
+  assignedEmployee: 'Pavan Kumar',
   expectedValue: '80000', // String input test
   notes: 'Evaluating auto equity credit APIs.',
   nextFollowUpDate: '2026-10-25'

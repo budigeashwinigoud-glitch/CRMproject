@@ -17,7 +17,7 @@ class FollowUp(Base):
     priority = Column(String(20), default="Medium")
     status = Column(String(30), default="Pending", index=True)  # 'Pending', 'Completed', 'Overdue'
     
-    assigned_employee = Column(String(100), default="Ashwini Sharma", index=True)
+    assigned_employee = Column(String(100), default="Pavan Kumar", index=True)
     assigned_user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     
     notes = Column(Text, nullable=True)
