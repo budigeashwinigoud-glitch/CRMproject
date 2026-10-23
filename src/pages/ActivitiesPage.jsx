@@ -75,7 +75,7 @@ React.useEffect(() => {
       <div className="page-header">
         <div className="page-title-group">
           <h1>
-            <span>Activity Audit & Timeline</span>
+            <span>Activity & Timeline</span>
             <span
               style={{
                 fontSize: '0.8rem',
@@ -90,7 +90,7 @@ React.useEffect(() => {
             </span>
           </h1>
           <p className="page-subtitle">
-            Unified chronological audit trail of all sales stage movements, notes, and outreach.
+            Chronological timeline of all stage movements, notes, and client outreach.
           </p>
         </div>
       </div>
@@ -116,7 +116,7 @@ React.useEffect(() => {
               type="text"
               className="form-input"
               style={{ paddingLeft: 32, fontSize: '0.8125rem' }}
-              placeholder="Search audit descriptions..."
+              placeholder="Search activity timeline..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

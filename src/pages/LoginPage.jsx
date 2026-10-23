@@ -139,23 +139,18 @@ function LoginPage() {
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
           }}
         >
-          {/* Glass Icon Bubble */}
-          <div
-            style={{
-              width: 54,
-              height: 54,
-              borderRadius: 16,
-              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(139, 92, 246, 0.25) 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 20px -4px rgba(37, 99, 235, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4)',
-              color: '#ffffff',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 16
-            }}
-          >
-            <Shield size={26} strokeWidth={2.2} color="#38bdf8" />
+          {/* Belvo Official Logo */}
+          <div style={{ marginBottom: 14, display: 'flex', justifyContent: 'center' }}>
+            <img
+              src="/belvo-logo-dark.png"
+              alt="Belvo Logo"
+              style={{
+                width: 130,
+                height: 'auto',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 4px 18px rgba(168, 85, 247, 0.35))'
+              }}
+            />
           </div>
 
           <h1

@@ -110,24 +110,16 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, onOpenCommandPalette }) =
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div
+          <img
+            src="/belvo-symbol.png"
+            alt="Belvo Logo"
             style={{
               width: 34,
               height: 34,
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #2563eb, #8b5cf6)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontWeight: 800,
-              fontSize: '1rem',
-              boxShadow: '0 2px 10px rgba(37,99,235,0.45)',
-              border: '1px solid rgba(255, 255, 255, 0.15)'
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 2px 8px rgba(168, 85, 247, 0.45))'
             }}
-          >
-            B
-          </div>
+          />
           {!isCollapsed && (
             <div>
               <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -341,7 +333,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, onOpenCommandPalette }) =
                 }}
               >
                 <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: backendConnected ? '#10b981' : '#38bdf8' }} />
-                {backendConnected ? "FastAPI Live" : "Local Sync"}
+                {backendConnected ? "Online" : "Ready"}
               </span>
             </div>
             <button
@@ -358,10 +350,10 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, onOpenCommandPalette }) =
                 justifyContent: 'center',
                 gap: 6
               }}
-              title="Sync CRM state from database"
+              title="Refresh workspace data"
             >
               <RotateCcw size={13} />
-              Sync & Refresh
+              Refresh Data
             </button>
           </div>
         ) : (
@@ -376,7 +368,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, onOpenCommandPalette }) =
               display: 'flex',
               justifyContent: 'center'
             }}
-            title="Sync & Refresh Data"
+            title="Refresh Data Data"
           >
             <RotateCcw size={16} />
           </button>

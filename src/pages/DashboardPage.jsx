@@ -104,7 +104,7 @@ export const DashboardPage = () => {
                 border: '1px solid #bfdbfe'
               }}
             >
-              Belvo Creative Agency (belvo.buzz)
+              Creative Agency Overview
             </span>
           </h1>
           <p className="page-subtitle">
@@ -158,10 +158,10 @@ export const DashboardPage = () => {
               Welcome to Belvo CRM
             </div>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Zero-clutter workspace ready for client pipeline
+              Agency Pipeline & Workspace
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.5, margin: 0 }}>
-              No hardcoded mock companies or dummy leads. Add your first brand lead directly or import your existing records via Excel or CSV.
+              Your workspace is ready. Add your first brand lead or import your existing contact list to begin tracking agency projects.
             </p>
           </div>
 
@@ -234,7 +234,7 @@ export const DashboardPage = () => {
         <StatCard
           label="Active Pipeline"
           value={`$${(metrics.activePipelineValue || 0).toLocaleString()}`}
-          subtext="Excluding Won/Lost"
+          subtext="Active in pipeline"
           icon={DollarSign}
           iconColor="#0284c7"
           iconBg="#e0f2fe"

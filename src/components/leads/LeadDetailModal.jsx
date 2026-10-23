@@ -111,7 +111,7 @@ export const LeadDetailModal = ({
     : lead.pipelineStage === 'Contacted'
     ? 'Send Belvo Creative Agency Portfolio & Scope Outline'
     : lead.pipelineStage === 'Qualified'
-    ? 'Set up technical demo with solutions engineer'
+    ? 'Schedule creative brief and project scope review'
     : lead.pipelineStage === 'Meeting'
     ? 'Prepare commercial enterprise proposal'
     : lead.pipelineStage === 'Proposal'
@@ -623,7 +623,7 @@ export const LeadDetailModal = ({
                     <div style={{ height: '100%', width: `${winProbability}%`, backgroundColor: '#10b981', borderRadius: 999 }} />
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#065f46' }}>
-                    Calibrated on deal size (${(lead.expectedValue || 0).toLocaleString()}) and agency engagement velocity.
+                    Based on deal size and pipeline engagement velocity.
                   </div>
                 </div>
               </div>

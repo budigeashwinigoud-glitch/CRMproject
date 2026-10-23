@@ -79,7 +79,7 @@ export default function UserManagementPage() {
       <div className="page-header" style={{ marginBottom: 24 }}>
         <div className="page-title-group">
           <h1>
-            <span>User Management & Access Control</span>
+            <span>Team & Permissions</span>
             <span
               style={{
                 fontSize: '0.75rem',
@@ -94,7 +94,7 @@ export default function UserManagementPage() {
             </span>
           </h1>
           <p className="page-subtitle">
-            Manage commercial team accounts, roles, and platform permissions (Administrator access only).
+            Manage commercial team members, role assignments, and platform access permissions.
           </p>
         </div>
 

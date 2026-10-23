@@ -195,7 +195,7 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar, onOpenCommandPale
           title="Visit official agency website: https://www.belvo.buzz/"
         >
           <Globe2 size={13} color="#2563eb" />
-          <span>belvo.buzz</span>
+          <span>Belvo Agency</span>
         </a>
 
         {/* API Live Status Badge */}
@@ -212,7 +212,7 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar, onOpenCommandPale
             fontWeight: 700,
             color: backendConnected ? '#15803d' : '#1d4ed8'
           }}
-          title={backendConnected ? "Connected to Belvo FastAPI REST API & Database." : "Centralized Local Storage active."}
+          title={backendConnected ? "Cloud Workspace Connected" : "Workspace Ready"}
         >
           <span
             style={{
@@ -222,7 +222,7 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar, onOpenCommandPale
               backgroundColor: backendConnected ? '#16a34a' : '#2563eb'
             }}
           />
-          <span>{backendConnected ? "FastAPI Live" : "Local Sync"}</span>
+          <span>{backendConnected ? "Online" : "Ready"}</span>
         </div>
 
         {/* Add Lead Primary CTA */}

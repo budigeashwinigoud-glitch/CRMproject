@@ -72,17 +72,17 @@ export const CommandPalette = ({ isOpen, onClose, onOpenAddLead, onSelectLead })
       category: 'Actions'
     },
     {
-      label: 'Sync Database & Refresh',
+      label: 'Refresh Workspace',
       action: async () => {
         onClose();
         await refreshData();
-        showToast('CRM workspace synchronized with database.', 'success');
+        showToast('Workspace refreshed successfully.', 'success');
       },
       icon: RotateCcw,
       category: 'Actions'
     },
     {
-      label: 'Visit Official Agency Website (belvo.buzz)',
+      label: 'Visit Belvo Agency Website',
       action: () => {
         window.open('https://www.belvo.buzz/', '_blank');
         onClose();
