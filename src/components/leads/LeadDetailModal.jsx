@@ -109,7 +109,7 @@ export const LeadDetailModal = ({
   const recommendedAction = lead.pipelineStage === 'New'
     ? 'Schedule discovery qualification call'
     : lead.pipelineStage === 'Contacted'
-    ? 'Send Belvo Open Finance API overview deck'
+    ? 'Send Belvo Creative Agency Portfolio & Scope Outline'
     : lead.pipelineStage === 'Qualified'
     ? 'Set up technical demo with solutions engineer'
     : lead.pipelineStage === 'Meeting'
@@ -120,7 +120,7 @@ export const LeadDetailModal = ({
     ? 'Align on pricing discount & final SLA terms'
     : 'Maintain periodic account check-in';
 
-  const aiFollowUpDraft = `Hi ${lead.fullName.split(' ')[0]},\n\nHope your week is going well! Following up on our recent conversation regarding ${lead.company}'s integration with Belvo Open Finance.\n\nWe'd love to schedule a brief 20-minute walk-through of the API platform and sandbox credentials tailored to your use case. Would this Thursday or Friday afternoon work for you?\n\nBest regards,\n${lead.assignedEmployee}\nBelvo Enterprise Team`;
+  const aiFollowUpDraft = `Hi ${lead.fullName.split(' ')[0]},\n\nHope your week is going well! Following up on our recent conversation regarding scaling ${lead.company}'s brand and digital presence with Belvo (belvo.buzz).\n\nWe'd love to schedule a brief 20-minute walk-through of creative brand strategy, web design, and digital scaling solutions tailored to your use case. Would this Thursday or Friday afternoon work for you?\n\nBest regards,\n${lead.assignedEmployee}\nBelvo Creative & Growth Team (belvo.buzz)`;
 
   return (
     <>
@@ -208,7 +208,7 @@ export const LeadDetailModal = ({
                 <Building size={14} />
                 <strong style={{ color: '#1e293b' }}>{lead.company}</strong>
                 <span>•</span>
-                <span style={{ color: '#0284c7', fontWeight: 600 }}>{lead.leadCategory || 'Open Finance'}</span>
+                <span style={{ color: '#0284c7', fontWeight: 600 }}>{lead.leadCategory || 'Brand Building & Web'}</span>
                 {lead.location && (
                   <>
                     <span>•</span>

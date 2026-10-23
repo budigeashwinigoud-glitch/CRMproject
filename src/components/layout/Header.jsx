@@ -169,25 +169,30 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
 
       {/* Right: Actions, Notifications & Profile */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        {/* LatAm Regional Hub Indicator */}
-        <div
+        {/* Belvo Agency Official Website Link */}
+        <a
+          href="https://www.belvo.buzz/"
+          target="_blank"
+          rel="noreferrer"
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            padding: '4px 10px',
+            padding: '4px 11px',
             backgroundColor: '#f8fafc',
             border: '1px solid #e2e8f0',
             borderRadius: 'var(--radius-full)',
             fontSize: '0.72rem',
-            color: '#64748b',
-            fontWeight: 600
+            color: '#475569',
+            fontWeight: 700,
+            textDecoration: 'none',
+            transition: 'all 0.15s ease'
           }}
-          title="Belvo Open Finance Latin America Operations Hub"
+          title="Visit official agency website: https://www.belvo.buzz/"
         >
-          <Globe2 size={13} color="#0284c7" />
-          <span>CDMX / LatAm Hub</span>
-        </div>
+          <Globe2 size={13} color="#2563eb" />
+          <span>belvo.buzz</span>
+        </a>
 
         {/* API Live Status Badge */}
         <div

@@ -133,7 +133,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 Belvo <span style={{ color: '#38bdf8', fontSize: '0.75rem', fontWeight: 700, backgroundColor: 'rgba(56, 189, 248, 0.12)', padding: '1px 6px', borderRadius: 4 }}>CRM</span>
               </div>
               <div style={{ color: '#64748b', fontSize: '0.67rem', fontWeight: 500, letterSpacing: '0.01em' }}>
-                Open Finance Intelligence
+                A Perfect Agency For Your Brand
               </div>
             </div>
           )}

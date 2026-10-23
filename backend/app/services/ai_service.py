@@ -50,12 +50,12 @@ def get_lead_insights(lead: Lead) -> AILeadInsightsResponse:
     # Action recommendations
     next_actions = [
         f"Schedule executive alignment call with {lead.full_name}",
-        f"Send Belvo Open Finance API collateral tailored for {lead.company}",
+        f"Send Belvo Creative Portfolio and branding strategy tailored for {lead.company}",
         "Confirm budget and Q4 procurement timeline"
     ]
 
     summary = lead.ai_summary or (
-        f"{lead.company} is an active prospect evaluated for Belvo financial data APIs. "
+        f"{lead.company} is an active prospect evaluated for Belvo brand strategy and creative scaling solutions. "
         f"Propensity score of {score}/100 based on enterprise tier and domain fit."
     )
 
@@ -134,11 +134,11 @@ def generate_message_draft(lead: Lead, req: AIMessageDraftRequest) -> AIMessageD
         subject = None
         body = (
             f"Hola {lead.full_name}, greeting from Belvo! "
-            f"Following up on {lead.company}'s open finance and payments integration inquiry. "
+            f"Following up on {lead.company}'s brand building, web development, and digital growth inquiry with Belvo (belvo.buzz). "
             f"Do you have 10 minutes today to review the technical proposal? Looking forward to connecting."
         )
     elif channel == "Linkedin":
-        subject = f"Connecting regarding {lead.company} & Belvo Open Finance"
+        subject = f"Connecting regarding {lead.company} & Belvo Creative & Digital Agency"
         body = (
             f"Hi {lead.full_name},\n\n"
             f"I noticed {lead.company}'s growth initiatives in Latin America financial data solutions. "

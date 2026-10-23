@@ -14,7 +14,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
     email: '',
     phone: '',
     leadSource: 'Website',
-    leadCategory: 'Fintech Platform',
+    leadCategory: 'Brand Building & Web',
     priority: 'Medium',
     pipelineStage: 'New',
     assignedEmployee: 'Pavan Kumar',
@@ -37,7 +37,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
         email: leadToEdit.email || '',
         phone: leadToEdit.phone || '',
         leadSource: leadToEdit.leadSource || 'Website',
-        leadCategory: leadToEdit.leadCategory || 'Fintech Platform',
+        leadCategory: leadToEdit.leadCategory || 'Brand Building & Web',
         priority: leadToEdit.priority || 'Medium',
         pipelineStage: leadToEdit.pipelineStage || 'New',
         assignedEmployee: leadToEdit.assignedEmployee || 'Pavan Kumar',
@@ -292,7 +292,7 @@ export const LeadFormModal = ({ isOpen, onClose, leadToEdit = null }) => {
               name="leadCategory"
               type="text"
               className="form-input"
-              placeholder="e.g. Enterprise Banking"
+              placeholder="e.g. Brand Identity, Web & App Development, Digital Ads"
               value={formData.leadCategory}
               onChange={handleChange}
             />

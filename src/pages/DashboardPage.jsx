@@ -104,11 +104,11 @@ export const DashboardPage = () => {
                 border: '1px solid #bfdbfe'
               }}
             >
-              Belvo Open Finance
+              Belvo Creative Agency (belvo.buzz)
             </span>
           </h1>
           <p className="page-subtitle">
-            Real-time pipeline analytics, deal velocity, and client engagement metrics across LatAm operations.
+            A Perfect Agency For Your Brand — Pipeline analytics, deal velocity, and client engagement for brand building, digital scaling, and creative campaigns.
           </p>
         </div>
 

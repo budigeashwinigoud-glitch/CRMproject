@@ -1,6 +1,6 @@
 # Belvo Internal CRM & AI-Powered Lead Management System
 
-A production-grade, secure, responsive B2B Open Finance CRM & Lead Intelligence platform engineered for LatAm sales operations.
+A production-grade, secure, responsive CRM & AI Lead Intelligence platform engineered for **Belvo** ([www.belvo.buzz](https://www.belvo.buzz/)) — A high-end creative, branding, and digital growth agency building brands from scratch and scaling businesses globally.
 
 - **Frontend**: React 19, React Router DOM 7, Lucide React, Vite, Accessible Design Tokens
 - **Backend**: Python 3.13, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2, PyJWT, bcrypt, openpyxl, pandas
