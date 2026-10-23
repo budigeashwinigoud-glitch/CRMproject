@@ -91,10 +91,10 @@ A production-grade, secure, responsive B2B Open Finance CRM & Lead Intelligence 
 
 ### Seeded Default Credentials (Development)
 - **Administrator**: `admin@belvo.com` / `Admin@12345` (Admin role, full team view)
-- **Employee 1**: `ashwini@belvo.com` / `Ashwini@12345` (Employee role, Nubank, Clip portfolio)
-- **Employee 2**: `carlos@belvo.com` / `Carlos@12345` (Employee role, Clara Cards, Creditas portfolio)
-- **Employee 3**: `mariana@belvo.com` / `Mariana@12345`
-- **Employee 4**: `alex@belvo.com` / `Alex@12345`
+- **Employee 1**: `ashwini@belvo.com` / `Ashwini@12345` (Employee role)
+- **Employee 2**: `carlos@belvo.com` / `Carlos@12345` (Employee role)
+- **Employee 3**: `mariana@belvo.com` / `Mariana@12345` (Employee role)
+- **Employee 4**: `alex@belvo.com` / `Alex@12345` (Employee role)
 
 ### 🎨 Frontend UI / UX Highlights & Enhancements
 - **Dynamic Perspective Pill**: Executive Dashboard header immediately displays whether viewing an individual employee portfolio (`👤 Portfolio: Ashwini Sharma`) or the team-wide view (`👑 Team-wide View (Admin)`).
@@ -384,10 +384,9 @@ CRMPROJECT/
 │   │   ├── ClientsPage.jsx
 │   │   ├── FollowUpsPage.jsx
 │   │   └── ActivitiesPage.jsx
-│   ├── services/
-│   │   ├── api.js            # Unified HTTP REST API client
-│   │   ├── dataService.js    # LocalStorage demo fallback store
-│   │   └── mockData.js       # Standard Belvo LatAm dataset
+│   │   ├── services/api.js   # Unified HTTP REST API client
+│   │   ├── services/dataService.js # LocalStorage fallback store
+│   │   └── services/mockData.js    # Pipeline stages, priorities, sources metadata
 │   ├── App.jsx
 │   ├── index.css
 │   └── main.jsx
