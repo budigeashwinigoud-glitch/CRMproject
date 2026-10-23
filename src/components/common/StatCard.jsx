@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
 export const StatCard = ({
   label,
@@ -14,7 +15,10 @@ export const StatCard = ({
   return (
     <div
       className="stat-card"
-      style={{ cursor: onClick ? 'pointer' : 'default' }}
+      style={{
+        cursor: onClick ? 'pointer' : 'default',
+        userSelect: 'none'
+      }}
       onClick={onClick}
     >
       <div className="stat-card-info">
@@ -25,14 +29,22 @@ export const StatCard = ({
             {trend && (
               <span
                 style={{
-                  color: trendPositive ? '#10b981' : '#ef4444',
-                  fontWeight: 600
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  color: trendPositive ? '#15803d' : '#b91c1c',
+                  backgroundColor: trendPositive ? '#f0fdf4' : '#fef2f2',
+                  padding: '1px 6px',
+                  borderRadius: 6,
+                  fontWeight: 700,
+                  fontSize: '0.72rem'
                 }}
               >
-                {trendPositive ? '↑' : '↓'} {trend}
+                {trendPositive ? <ArrowUpRight size={12} strokeWidth={2.5} /> : <ArrowDownRight size={12} strokeWidth={2.5} />}
+                {trend}
               </span>
             )}
-            {subtext}
+            <span>{subtext}</span>
           </span>
         )}
       </div>
@@ -40,7 +52,11 @@ export const StatCard = ({
       {Icon && (
         <div
           className="stat-icon-wrapper"
-          style={{ backgroundColor: iconBg, color: iconColor }}
+          style={{
+            backgroundColor: iconBg,
+            color: iconColor,
+            border: `1px solid ${iconColor}20`
+          }}
         >
           <Icon size={22} strokeWidth={2.2} />
         </div>

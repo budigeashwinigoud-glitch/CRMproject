@@ -19,49 +19,64 @@ import { useCRM } from '../../context/CRMContext';
 export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   const { metrics, refreshData, backendConnected } = useCRM();
 
-  const navItems = [
+  const navSections = [
     {
-      label: 'Dashboard',
-      path: '/',
-      icon: LayoutDashboard
+      title: 'Core Pipeline',
+      items: [
+        {
+          label: 'Dashboard',
+          path: '/',
+          icon: LayoutDashboard
+        },
+        {
+          label: 'Leads',
+          path: '/leads',
+          icon: Users,
+          badge: metrics?.totalLeads > 0 ? metrics.totalLeads : null
+        },
+        {
+          label: 'Sales Pipeline',
+          path: '/pipeline',
+          icon: Kanban
+        },
+        {
+          label: 'Clients',
+          path: '/clients',
+          icon: Building2
+        }
+      ]
     },
     {
-      label: 'Leads',
-      path: '/leads',
-      icon: Users,
-      badge: metrics?.totalLeads > 0 ? metrics.totalLeads : null
+      title: 'Activities & Audit',
+      items: [
+        {
+          label: 'Follow-ups',
+          path: '/follow-ups',
+          icon: CalendarCheck,
+          badge: metrics?.overdueFollowUps > 0 ? `${metrics.overdueFollowUps} due` : null,
+          badgeColor: '#ef4444'
+        },
+        {
+          label: 'Activity Audit',
+          path: '/activities',
+          icon: Activity
+        },
+        {
+          label: 'Archived Leads',
+          path: '/archived-leads',
+          icon: Archive
+        }
+      ]
     },
     {
-      label: 'Sales Pipeline',
-      path: '/pipeline',
-      icon: Kanban
-    },
-    {
-      label: 'Clients',
-      path: '/clients',
-      icon: Building2
-    },
-    {
-      label: 'Follow-ups',
-      path: '/follow-ups',
-      icon: CalendarCheck,
-      badge: metrics?.overdueFollowUps > 0 ? `${metrics.overdueFollowUps} due` : null,
-      badgeColor: '#ef4444'
-    },
-    {
-      label: 'Activities',
-      path: '/activities',
-      icon: Activity
-    },
-    {
-      label: 'Archived Leads',
-      path: '/archived-leads',
-      icon: Archive
-    },
-    {
-      label: 'User Management',
-      path: '/users',
-      icon: UserCog
+      title: 'Administration',
+      items: [
+        {
+          label: 'User Management',
+          path: '/users',
+          icon: UserCog
+        }
+      ]
     }
   ];
 
@@ -69,15 +84,16 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     <aside
       style={{
         width: isCollapsed ? 'var(--sidebar-collapsed-width)' : 'var(--sidebar-width)',
-        backgroundColor: 'var(--sidebar-bg)',
-        borderRight: '1px solid var(--sidebar-border)',
+        backgroundColor: '#090e1a',
+        backgroundImage: 'linear-gradient(180deg, #090e1a 0%, #060913 100%)',
+        borderRight: '1px solid rgba(30, 41, 59, 0.8)',
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        transition: 'width 0.2s ease',
+        transition: 'width 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
         flexShrink: 0
       }}
     >
@@ -88,8 +104,8 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: isCollapsed ? 'center' : 'space-between',
-          padding: isCollapsed ? '0 8px' : '0 20px',
-          borderBottom: '1px solid var(--sidebar-border)'
+          padding: isCollapsed ? '0 8px' : '0 18px',
+          borderBottom: '1px solid rgba(30, 41, 59, 0.8)'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -105,7 +121,8 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               color: '#ffffff',
               fontWeight: 800,
               fontSize: '1rem',
-              boxShadow: '0 2px 8px rgba(37,99,235,0.4)'
+              boxShadow: '0 2px 10px rgba(37,99,235,0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.15)'
             }}
           >
             B
@@ -113,10 +130,10 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           {!isCollapsed && (
             <div>
               <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 6 }}>
-                Belvo <span style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 600 }}>CRM</span>
+                Belvo <span style={{ color: '#38bdf8', fontSize: '0.75rem', fontWeight: 700, backgroundColor: 'rgba(56, 189, 248, 0.12)', padding: '1px 6px', borderRadius: 4 }}>CRM</span>
               </div>
-              <div style={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 500 }}>
-                Enterprise Platform
+              <div style={{ color: '#64748b', fontSize: '0.67rem', fontWeight: 500, letterSpacing: '0.01em' }}>
+                Open Finance Intelligence
               </div>
             </div>
           )}
@@ -132,9 +149,12 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               cursor: 'pointer',
               padding: 4,
               borderRadius: 6,
-              display: 'flex'
+              display: 'flex',
+              transition: 'color 0.15s ease'
             }}
             title="Collapse Sidebar"
+            onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
           >
             <ChevronLeft size={18} />
           </button>
@@ -161,94 +181,117 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         </div>
       )}
 
-      {/* Navigation Links */}
-      <nav style={{ flex: 1, padding: '16px 10px', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                style={({ isActive }) => ({
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: isCollapsed ? '10px 0' : '10px 14px',
-                  justifyContent: isCollapsed ? 'center' : 'flex-start',
-                  borderRadius: 'var(--radius-md)',
-                  color: isActive ? 'var(--sidebar-text-active)' : 'var(--sidebar-text)',
-                  backgroundColor: isActive ? 'var(--sidebar-active-bg)' : 'transparent',
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: '0.875rem',
-                  transition: 'all 0.15s ease',
-                  textDecoration: 'none'
+      {/* Navigation Sections */}
+      <nav style={{ flex: 1, padding: isCollapsed ? '12px 6px' : '16px 10px', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {navSections.map((sec) => (
+            <div key={sec.title}>
+              {!isCollapsed && (
+                <div
+                  style={{
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    color: '#475569',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    padding: '0 12px 6px',
+                    userSelect: 'none'
+                  }}
+                >
+                  {sec.title}
+                </div>
+              )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {sec.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      end={item.path === '/'}
+                      style={({ isActive }) => ({
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: isCollapsed ? '10px 0' : '9px 12px',
+                        justifyContent: isCollapsed ? 'center' : 'flex-start',
+                        borderRadius: 8,
+                        color: isActive ? '#ffffff' : '#94a3b8',
+                        backgroundColor: isActive ? 'rgba(30, 41, 59, 0.75)' : 'transparent',
+                        fontWeight: isActive ? 600 : 500,
+                        fontSize: '0.85rem',
+                        transition: 'all 0.15s ease',
+                        textDecoration: 'none',
+                        position: 'relative',
+                        boxShadow: isActive ? 'inset 3px 0 0 #38bdf8' : 'none'
+                      })}
+                      title={isCollapsed ? item.label : undefined}
+                    >
+                      <Icon size={18} strokeWidth={2} />
+                      {!isCollapsed && (
+                        <span style={{ flex: 1 }}>{item.label}</span>
+                      )}
+                      {!isCollapsed && item.badge && (
+                        <span
+                          style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            padding: '1px 6px',
+                            borderRadius: 10,
+                            backgroundColor: item.badgeColor || '#1e293b',
+                            color: '#ffffff'
+                          }}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </NavLink>
+                  );
                 })}
-                title={isCollapsed ? item.label : undefined}
-              >
-                <Icon size={19} />
-                {!isCollapsed && (
-                  <span style={{ flex: 1 }}>{item.label}</span>
-                )}
-                {!isCollapsed && item.badge && (
-                  <span
-                    style={{
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      padding: '2px 7px',
-                      borderRadius: 12,
-                      backgroundColor: item.badgeColor || '#1e293b',
-                      color: '#ffffff'
-                    }}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </NavLink>
-            );
-          })}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* AI & Intelligence Section Tag */}
+        {/* AI & Intelligence Teaser */}
         {!isCollapsed && (
           <div
             style={{
               marginTop: 24,
               padding: '12px 14px',
-              backgroundColor: '#131b2e',
+              backgroundColor: 'rgba(30, 27, 75, 0.4)',
               borderRadius: 10,
-              border: '1px solid #1e293b'
+              border: '1px solid rgba(139, 92, 246, 0.25)'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a78bfa', fontSize: '0.75rem', fontWeight: 700, marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#c084fc', fontSize: '0.75rem', fontWeight: 700, marginBottom: 4 }}>
               <Sparkles size={14} />
-              AI Lead Intelligence
+              AI Lead Engine
             </div>
-            <p style={{ color: '#64748b', fontSize: '0.7rem', lineHeight: 1.4 }}>
-              Automated scoring, predictive conversion metrics & next-best actions.
+            <p style={{ color: '#94a3b8', fontSize: '0.7rem', lineHeight: 1.4, margin: 0 }}>
+              Scoring models, predictive conversion win rates & next-best actions.
             </p>
           </div>
         )}
       </nav>
 
-      {/* Footer Info & Refresh */}
+      {/* Footer System Status & Sync */}
       <div
         style={{
-          padding: isCollapsed ? '12px 6px' : '16px',
-          borderTop: '1px solid var(--sidebar-border)',
-          backgroundColor: '#070b14'
+          padding: isCollapsed ? '12px 6px' : '14px 16px',
+          borderTop: '1px solid rgba(30, 41, 59, 0.8)',
+          backgroundColor: '#050811'
         }}
       >
         {!isCollapsed ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                System Status
+              <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                System Sync
               </span>
               <span
                 style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.68rem',
                   fontWeight: 700,
                   color: backendConnected ? '#10b981' : '#38bdf8',
                   backgroundColor: backendConnected ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
@@ -268,7 +311,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               className="btn btn-secondary btn-sm"
               style={{
                 width: '100%',
-                backgroundColor: '#151e2e',
+                backgroundColor: '#0f172a',
                 borderColor: '#1e293b',
                 color: '#94a3b8',
                 fontSize: '0.75rem',

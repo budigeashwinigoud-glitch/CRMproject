@@ -15,6 +15,7 @@ import {
   Eye,
   Edit2,
   Trash2,
+  Copy,
   Calendar,
   RotateCcw,
   Download,
@@ -149,6 +150,10 @@ export const LeadsPage = () => {
   }, [leads, searchTerm, selectedStage, selectedPriority, selectedSource, selectedEmployee, sortField, sortDirection]);
 
   // Pagination calculations
+  const filteredTotalValue = useMemo(() => {
+    return filteredLeads.reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
+  }, [filteredLeads]);
+
   const totalPages = Math.ceil(filteredLeads.length / pageSize) || 1;
   const paginatedLeads = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -172,7 +177,7 @@ export const LeadsPage = () => {
                 borderRadius: 'var(--radius-full)'
               }}
             >
-              {filteredLeads.length} Total
+              {filteredLeads.length} Leads • ${(filteredTotalValue || 0).toLocaleString()} Volume
             </span>
           </h1>
           <p className="page-subtitle">
@@ -394,6 +399,19 @@ export const LeadsPage = () => {
                         </div>
                         <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                           <span>{lead.fullName}</span> • <span>{lead.email}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigator.clipboard?.writeText(lead.email);
+                              showToast(`Copied ${lead.email}`, 'info');
+                            }}
+                            className="btn btn-ghost btn-sm"
+                            style={{ padding: '1px 4px', height: 'auto', color: '#94a3b8' }}
+                            title="Copy email address"
+                          >
+                            <Copy size={11} />
+                          </button>
                         </div>
                       </td>
 

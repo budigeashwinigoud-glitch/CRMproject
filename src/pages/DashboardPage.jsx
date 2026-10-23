@@ -17,7 +17,12 @@ import {
   AlertCircle,
   UploadCloud,
   Building2,
-  Sparkles
+  Sparkles,
+  Zap,
+  Filter,
+  CheckCircle2,
+  Layers,
+  BarChart3
 } from 'lucide-react';
 
 export const DashboardPage = () => {
@@ -27,6 +32,7 @@ export const DashboardPage = () => {
   const [selectedLead, setSelectedLead] = useState(null);
   const [editingLead, setEditingLead] = useState(null);
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
+  const [dealFilter, setDealFilter] = useState('all'); // 'all' | 'high' | 'enterprise'
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -34,11 +40,46 @@ export const DashboardPage = () => {
     return followUps.filter(f => f.status === 'Overdue' || (f.status === 'Pending' && f.dueDate < todayStr));
   }, [followUps, todayStr]);
 
+  // Funnel calculations
+  const funnelStages = useMemo(() => {
+    const discoveryStages = ['New', 'Contacted'];
+    const qualificationStages = ['Qualified', 'Meeting'];
+    const proposalStages = ['Proposal', 'Negotiation'];
+    const wonStages = ['Won'];
+
+    const discoveryCount = leads.filter(l => discoveryStages.includes(l.pipelineStage)).length;
+    const qualificationCount = leads.filter(l => qualificationStages.includes(l.pipelineStage)).length;
+    const proposalCount = leads.filter(l => proposalStages.includes(l.pipelineStage)).length;
+    const wonCount = leads.filter(l => wonStages.includes(l.pipelineStage)).length;
+
+    const discoveryVal = leads.filter(l => discoveryStages.includes(l.pipelineStage)).reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
+    const qualificationVal = leads.filter(l => qualificationStages.includes(l.pipelineStage)).reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
+    const proposalVal = leads.filter(l => proposalStages.includes(l.pipelineStage)).reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
+    const wonVal = leads.filter(l => wonStages.includes(l.pipelineStage)).reduce((acc, l) => acc + (Number(l.expectedValue) || 0), 0);
+
+    return [
+      { id: 'discovery', label: '1. Discovery & Outreach', count: discoveryCount, value: discoveryVal, color: '#38bdf8' },
+      { id: 'qualification', label: '2. Demo & Technical Fit', count: qualificationCount, value: qualificationVal, color: '#6366f1' },
+      { id: 'proposal', label: '3. Proposal & Negotiation', count: proposalCount, value: proposalVal, color: '#a855f7' },
+      { id: 'won', label: '4. Closed Won Revenue', count: wonCount, value: wonVal, color: '#10b981' }
+    ];
+  }, [leads]);
+
+  const filteredProspects = useMemo(() => {
+    let list = leads.slice();
+    if (dealFilter === 'high') {
+      list = list.filter(l => l.priority === 'High');
+    } else if (dealFilter === 'enterprise') {
+      list = list.filter(l => Number(l.expectedValue) >= 50000);
+    }
+    return list.slice(0, 5);
+  }, [leads, dealFilter]);
+
   if (!metrics) {
     return (
       <div style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
         <div style={{ width: 32, height: 32, border: '3px solid #e2e8f0', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-        <span>Loading dashboard analytics...</span>
+        <span>Loading executive analytics...</span>
       </div>
     );
   }
@@ -55,10 +96,10 @@ export const DashboardPage = () => {
             <span
               style={{
                 fontSize: '0.75rem',
-                fontWeight: 600,
+                fontWeight: 700,
                 backgroundColor: '#eff6ff',
                 color: '#2563eb',
-                padding: '3px 8px',
+                padding: '3px 10px',
                 borderRadius: 'var(--radius-full)',
                 border: '1px solid #bfdbfe'
               }}
@@ -67,7 +108,7 @@ export const DashboardPage = () => {
             </span>
           </h1>
           <p className="page-subtitle">
-            Real-time pipeline analytics, deal velocity, and client engagement metrics.
+            Real-time pipeline analytics, deal velocity, and client engagement metrics across LatAm operations.
           </p>
         </div>
 
@@ -77,13 +118,14 @@ export const DashboardPage = () => {
             className="btn btn-secondary btn-sm"
             onClick={() => navigate('/pipeline')}
           >
-            <span>View Kanban</span>
+            <span>Kanban Board</span>
             <ArrowRight size={14} />
           </button>
           <button
             type="button"
             className="btn btn-primary btn-sm"
             onClick={() => setIsAddLeadOpen(true)}
+            style={{ boxShadow: '0 2px 6px -1px rgba(37, 99, 235, 0.35)' }}
           >
             <Plus size={16} />
             <span>Add New Lead</span>
@@ -98,9 +140,10 @@ export const DashboardPage = () => {
             marginBottom: 24,
             padding: '24px 28px',
             backgroundColor: '#0f172a',
-            backgroundImage: 'radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.25) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.2) 0px, transparent 50%)',
+            backgroundImage: 'radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.28) 0px, transparent 55%), radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.22) 0px, transparent 55%)',
             borderRadius: 'var(--radius-lg)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.3)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
@@ -109,16 +152,16 @@ export const DashboardPage = () => {
             gap: 20
           }}
         >
-          <div style={{ maxWidth: 560 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#38bdf8', fontSize: '0.8125rem', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <Sparkles size={16} />
+          <div style={{ maxWidth: 580 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#38bdf8', fontSize: '0.78rem', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              <Sparkles size={15} />
               Welcome to Belvo CRM
             </div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Clean workspace ready for your sales pipeline
+            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
+              Zero-clutter workspace ready for client pipeline
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.5, margin: 0 }}>
-              No sample data is cluttering your system. Add your first client lead directly, or import your existing records from Excel or CSV.
+              No hardcoded mock companies or dummy leads. Add your first fintech lead directly or import your existing records via Excel or CSV.
             </p>
           </div>
 
@@ -138,7 +181,7 @@ export const DashboardPage = () => {
               onClick={() => setIsAddLeadOpen(true)}
             >
               <Plus size={15} />
-              <span>Add Your First Lead</span>
+              <span>Add First Lead</span>
             </button>
           </div>
         </div>
@@ -149,7 +192,7 @@ export const DashboardPage = () => {
         <div
           style={{
             marginBottom: 20,
-            padding: '12px 16px',
+            padding: '12px 18px',
             backgroundColor: '#fef2f2',
             border: '1px solid #fecaca',
             borderRadius: 'var(--radius-md)',
@@ -229,14 +272,54 @@ export const DashboardPage = () => {
         />
       </div>
 
+      {/* Pipeline Funnel Velocity Bar */}
+      <div className="crm-card" style={{ marginBottom: 24, padding: '18px 22px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Layers size={18} color="#2563eb" />
+            <h3 className="card-title" style={{ margin: 0 }}>Sales Pipeline Velocity Funnel</h3>
+          </div>
+          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+            ${(metrics.totalPipelineValue || 0).toLocaleString()} Total Pipeline Volume
+          </span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+          {funnelStages.map(fn => (
+            <div
+              key={fn.id}
+              style={{
+                padding: '12px 14px',
+                backgroundColor: '#f8fafc',
+                borderRadius: 8,
+                border: '1px solid #e2e8f0',
+                borderLeft: `4px solid ${fn.color}`
+              }}
+            >
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: 4 }}>
+                {fn.label}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a' }}>
+                  {fn.count} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#64748b' }}>deals</span>
+                </span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>
+                  ${fn.value.toLocaleString()}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Main Analytics Grid: Stage Progression & Lead Sources */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 20, marginBottom: 24 }}>
         {/* Pipeline Stage Distribution */}
         <div className="crm-card">
           <div className="card-header">
             <h3 className="card-title">Pipeline Stage Distribution</h3>
-            <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>
-              ${(metrics.totalPipelineValue || 0).toLocaleString()} Total Volume
+            <span style={{ fontSize: '0.8125rem', color: '#64748b', fontWeight: 600 }}>
+              {leads.length} Active Records
             </span>
           </div>
           <div className="card-body">
@@ -291,7 +374,7 @@ export const DashboardPage = () => {
         <div className="crm-card">
           <div className="card-header">
             <h3 className="card-title">Lead Acquisition Sources</h3>
-            <span style={{ fontSize: '0.8125rem', color: '#64748b' }}>By Channel</span>
+            <span style={{ fontSize: '0.8125rem', color: '#64748b', fontWeight: 600 }}>By Inbound Channel</span>
           </div>
           <div className="card-body">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -329,18 +412,48 @@ export const DashboardPage = () => {
       </div>
 
       {/* Bottom Grid: Recent Leads & Activity Timeline */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 20 }}>
         {/* Recent High-Priority Prospects */}
         <div className="crm-card">
           <div className="card-header">
-            <h3 className="card-title">Recent High-Value Prospects</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <h3 className="card-title">High-Value Prospects</h3>
+              {leads.length > 0 && (
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {[
+                    { id: 'all', label: 'All' },
+                    { id: 'high', label: 'High Priority' },
+                    { id: 'enterprise', label: '$50k+' }
+                  ].map(f => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setDealFilter(f.id)}
+                      style={{
+                        padding: '2px 8px',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        borderRadius: 6,
+                        border: '1px solid',
+                        borderColor: dealFilter === f.id ? '#2563eb' : '#e2e8f0',
+                        backgroundColor: dealFilter === f.id ? '#eff6ff' : '#ffffff',
+                        color: dealFilter === f.id ? '#2563eb' : '#64748b',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             {leads.length > 0 && (
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={() => navigate('/leads')}
               >
-                View All
+                View All Leads
               </button>
             )}
           </div>
@@ -373,8 +486,8 @@ export const DashboardPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {leads.slice(0, 5).map(lead => (
-                    <tr key={lead.id}>
+                  {filteredProspects.map(lead => (
+                    <tr key={lead.id} style={{ cursor: 'pointer' }} onClick={() => setSelectedLead(lead)}>
                       <td>
                         <div style={{ fontWeight: 700, color: '#0f172a' }}>{lead.company}</div>
                         <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{lead.fullName}</div>
@@ -382,7 +495,7 @@ export const DashboardPage = () => {
                       <td>
                         <Badge type={lead.pipelineStage} />
                       </td>
-                      <td style={{ fontWeight: 700 }}>
+                      <td style={{ fontWeight: 700, color: '#0f172a' }}>
                         ${(lead.expectedValue || 0).toLocaleString()}
                       </td>
                       <td style={{ fontSize: '0.8125rem', color: '#475569' }}>
@@ -392,7 +505,10 @@ export const DashboardPage = () => {
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
-                          onClick={() => setSelectedLead(lead)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedLead(lead);
+                          }}
                         >
                           Inspect
                         </button>
@@ -419,7 +535,7 @@ export const DashboardPage = () => {
               </button>
             )}
           </div>
-          <div className="card-body" style={{ maxHeight: 340, overflowY: 'auto' }}>
+          <div className="card-body" style={{ maxHeight: 360, overflowY: 'auto' }}>
             {activities.length === 0 ? (
               <div style={{ padding: '36px 20px', textAlign: 'center', color: '#94a3b8' }}>
                 <Activity size={28} color="#cbd5e1" style={{ margin: '0 auto 8px' }} />
