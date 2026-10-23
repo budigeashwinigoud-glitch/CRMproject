@@ -557,3 +557,47 @@ a {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+/* Liquidomorphism & Glassmorphism Keyframes */
+@keyframes liquidBlobOne {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.12) rotate(12deg);
+  }
+  66% {
+    transform: translate(-25px, 20px) scale(0.92) rotate(-8deg);
+  }
+}
+
+@keyframes liquidBlobTwo {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(-40px, 40px) scale(1.15) rotate(-14deg);
+  }
+  66% {
+    transform: translate(35px, -30px) scale(0.88) rotate(10deg);
+  }
+}
+
+@keyframes liquidBlobThree {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(25px, 35px) scale(1.1);
+  }
+}
+
+@keyframes glassShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+

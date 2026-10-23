@@ -89,12 +89,12 @@ A production-grade, secure, responsive B2B Open Finance CRM & Lead Intelligence 
 - **Token Security**: Signed HMAC-SHA256 JWT bearer tokens with 24-hour expiration.
 - **Interactive UI Role Switcher**: Click the user badge in the top navigation header to toggle between **Admin** (`admin@belvo.com`) and **Employee** (`pavan@belvo.com` / `carlos@belvo.com`) to test live permissions, role restrictions, and employee lead isolation in real time.
 
-### Seeded Default Credentials (Development)
-- **Administrator**: `admin@belvo.com` / `Admin@12345` (Admin role, full team view)
-- **Employee 1**: `pavan@belvo.com` / `Pavan@12345` (Employee role)
-- **Employee 2**: `carlos@belvo.com` / `Carlos@12345` (Employee role)
-- **Employee 3**: `mariana@belvo.com` / `Mariana@12345` (Employee role)
-- **Employee 4**: `alex@belvo.com` / `Alex@12345` (Employee role)
+### Authorized Roles & Access (Development / Staging)
+- **Administrator**: dmin@belvo.com (Admin role, full team-wide view, user provisioning)
+- **Employee**: pavan@belvo.com (Employee role, assigned leads, follow-up scheduling)
+
+> [!NOTE]
+> For security, default credentials are not rendered on the public login interface. The authentication gateway implements an enterprise Liquid Glassmorphism interface with zero-trust validation.
 
 ### 🎨 Frontend UI / UX Highlights & Enhancements
 - **Dynamic Perspective Pill**: Executive Dashboard header immediately displays whether viewing an individual employee portfolio (`👤 Portfolio: Pavan Kumar`) or the team-wide view (`👑 Team-wide View (Admin)`).
