@@ -17,7 +17,7 @@ import {
 import { useCRM } from '../../context/CRMContext';
 
 export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
-  const { metrics, resetDemoData, backendConnected } = useCRM();
+  const { metrics, refreshData, backendConnected } = useCRM();
 
   const navItems = [
     {
@@ -29,7 +29,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       label: 'Leads',
       path: '/leads',
       icon: Users,
-      badge: metrics?.totalLeads
+      badge: metrics?.totalLeads > 0 ? metrics.totalLeads : null
     },
     {
       label: 'Sales Pipeline',
@@ -62,8 +62,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       label: 'User Management',
       path: '/users',
       icon: UserCog
-   }
-
+    }
   ];
 
   return (
@@ -117,7 +116,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
                 Belvo <span style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 600 }}>CRM</span>
               </div>
               <div style={{ color: '#64748b', fontSize: '0.68rem', fontWeight: 500 }}>
-                Lead Intelligence
+                Enterprise Platform
               </div>
             </div>
           )}
@@ -224,16 +223,16 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#a78bfa', fontSize: '0.75rem', fontWeight: 700, marginBottom: 4 }}>
               <Sparkles size={14} />
-              AI Lead Scoring
+              AI Lead Intelligence
             </div>
             <p style={{ color: '#64748b', fontSize: '0.7rem', lineHeight: 1.4 }}>
-              AI insights & predictive conversions ready for ML pipeline integration.
+              Automated scoring, predictive conversion metrics & next-best actions.
             </p>
           </div>
         )}
       </nav>
 
-      {/* Footer Info & Reset Demo */}
+      {/* Footer Info & Refresh */}
       <div
         style={{
           padding: isCollapsed ? '12px 6px' : '16px',
@@ -244,41 +243,49 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
         {!isCollapsed ? (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                Environment
+              <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                System Status
               </span>
               <span
                 style={{
                   fontSize: '0.7rem',
                   fontWeight: 700,
-                  color: backendConnected ? '#38bdf8' : '#10b981',
-                  backgroundColor: backendConnected ? 'rgba(56,189,248,0.1)' : 'rgba(16,185,129,0.1)',
-                  padding: '2px 6px',
-                  borderRadius: 4
+                  color: backendConnected ? '#10b981' : '#38bdf8',
+                  backgroundColor: backendConnected ? 'rgba(16,185,129,0.1)' : 'rgba(56,189,248,0.1)',
+                  padding: '2px 8px',
+                  borderRadius: 12,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5
                 }}
               >
-                {backendConnected ? "Live Backend" : "Demo Active"}
+                <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: backendConnected ? '#10b981' : '#38bdf8' }} />
+                {backendConnected ? "Live API" : "Local Sync"}
               </span>
             </div>
             <button
-              onClick={resetDemoData}
+              onClick={() => refreshData()}
               className="btn btn-secondary btn-sm"
               style={{
                 width: '100%',
                 backgroundColor: '#151e2e',
                 borderColor: '#1e293b',
                 color: '#94a3b8',
-                fontSize: '0.75rem'
+                fontSize: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6
               }}
-              title="Reset records to default demo state"
+              title="Sync CRM state from database"
             >
               <RotateCcw size={13} />
-              Reset Demo Data
+              Sync & Refresh
             </button>
           </div>
         ) : (
           <button
-            onClick={resetDemoData}
+            onClick={() => refreshData()}
             style={{
               background: 'transparent',
               border: 'none',
@@ -288,7 +295,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
               display: 'flex',
               justifyContent: 'center'
             }}
-            title="Reset Demo Data"
+            title="Sync & Refresh Data"
           >
             <RotateCcw size={16} />
           </button>

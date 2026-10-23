@@ -92,6 +92,35 @@ export const PipelinePage = () => {
         </div>
       </div>
 
+      {/* Zero Deals Quick Prompt */}
+      {leads.length === 0 && (
+        <div
+          style={{
+            marginBottom: 18,
+            padding: '12px 18px',
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12
+          }}
+        >
+          <span style={{ fontSize: '0.85rem', color: '#1d4ed8' }}>
+            No active deals in the pipeline. Click <strong>+ Add Lead</strong> to populate your first sales stage.
+          </span>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => setIsAddLeadOpen(true)}
+          >
+            <Plus size={14} />
+            <span>Add Lead</span>
+          </button>
+        </div>
+      )}
+
       {/* Filter Bar */}
       <div
         className="crm-card"

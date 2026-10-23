@@ -8,21 +8,22 @@ import {
   CheckCircle2,
   Menu,
   ShieldCheck,
-  LogOut
-} 
-from 'lucide-react';
+  LogOut,
+  Sparkles
+} from 'lucide-react';
 import { useCRM } from '../../context/CRMContext';
 
 export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
   const navigate = useNavigate();
-  const { followUps, backendConnected,setCurrentUser,currentUser } = useCRM();
+  const { followUps, backendConnected, setCurrentUser, currentUser } = useCRM();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+
   const handleLogout = () => {
-  crmApi.logout();
-  setCurrentUser(null);
-  navigate('/login', { replace: true });
-};
+    crmApi.logout();
+    setCurrentUser(null);
+    navigate('/login', { replace: true });
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -33,6 +34,15 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
   };
 
   const overdueList = followUps.filter(f => f.status === 'Overdue' || (f.status === 'Pending' && f.dueDate < new Date().toISOString().split('T')[0]));
+
+  const userDisplayName = currentUser?.fullName || currentUser?.name || currentUser?.email || 'User';
+  const userInitials = userDisplayName
+    .trim()
+    .split(/\s+/)
+    .map(part => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   return (
     <header
@@ -80,7 +90,7 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
               width: '100%',
-              padding: '8px 12px 8px 36px',
+              padding: '8px 68px 8px 36px',
               fontSize: '0.875rem',
               backgroundColor: '#f8fafc',
               border: '1px solid #e2e8f0',
@@ -89,12 +99,30 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
               transition: 'all 0.15s ease'
             }}
           />
+          <span
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              color: '#94a3b8',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: 4,
+              padding: '2px 5px',
+              pointerEvents: 'none'
+            }}
+          >
+            Ctrl K
+          </span>
         </form>
       </div>
 
       {/* Right: Actions, Notifications & Profile */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        {/* API / Demo Badge */}
+        {/* API Live Status Badge */}
         <div
           style={{
             display: 'flex',
@@ -108,10 +136,17 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             fontWeight: 600,
             color: backendConnected ? '#15803d' : '#1d4ed8'
           }}
-          title={backendConnected ? "Connected to Belvo FastAPI REST API & Database." : "Centralized Mock & LocalStorage active."}
+          title={backendConnected ? "Connected to Belvo FastAPI REST API & Database." : "Centralized Local Storage active."}
         >
-          <ShieldCheck size={14} color={backendConnected ? "#16a34a" : "#2563eb"} />
-          <span>{backendConnected ? "FastAPI Live" : "Local Demo Storage"}</span>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              backgroundColor: backendConnected ? '#16a34a' : '#2563eb'
+            }}
+          />
+          <span>{backendConnected ? "FastAPI Live" : "Local Store"}</span>
         </div>
 
         {/* Add Lead Primary CTA */}
@@ -157,26 +192,26 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
                 position: 'absolute',
                 top: 'calc(100% + 8px)',
                 right: 0,
-                width: 300,
+                width: 320,
                 backgroundColor: '#ffffff',
                 border: '1px solid #e2e8f0',
                 borderRadius: 'var(--radius-lg)',
                 boxShadow: 'var(--shadow-xl)',
-                padding: 12,
+                padding: 14,
                 zIndex: 110
               }}
             >
-              <div style={{ fontWeight: 700, fontSize: '0.875rem', marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-                <span>Notifications</span>
-                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{overdueList.length} alert{overdueList.length === 1 ? '' : 's'}</span>
+              <div style={{ fontWeight: 700, fontSize: '0.875rem', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#0f172a' }}>Follow-up Reminders</span>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{overdueList.length} alert{overdueList.length === 1 ? '' : 's'}</span>
               </div>
               {overdueList.length === 0 ? (
-                <div style={{ fontSize: '0.8rem', color: '#64748b', padding: '12px 0', textAlign: 'center' }}>
-                  <CheckCircle2 size={20} color="#10b981" style={{ margin: '0 auto 6px' }} />
-                  All scheduled follow-ups are up to date!
+                <div style={{ fontSize: '0.8rem', color: '#64748b', padding: '16px 0', textAlign: 'center' }}>
+                  <CheckCircle2 size={22} color="#10b981" style={{ margin: '0 auto 8px' }} />
+                  <div>All scheduled follow-ups are up to date!</div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 200, overflowY: 'auto' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
                   {overdueList.map(item => (
                     <div
                       key={item.id}
@@ -185,16 +220,16 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
                         setShowNotifications(false);
                       }}
                       style={{
-                        padding: '8px 10px',
+                        padding: '9px 12px',
                         backgroundColor: '#fef2f2',
                         borderRadius: 6,
                         borderLeft: '3px solid #ef4444',
                         cursor: 'pointer',
-                        fontSize: '0.75rem'
+                        fontSize: '0.78rem'
                       }}
                     >
-                      <div style={{ fontWeight: 600, color: '#991b1b' }}>{item.title}</div>
-                      <div style={{ color: '#b91c1c' }}>{item.company} • Due {item.dueDate}</div>
+                      <div style={{ fontWeight: 700, color: '#991b1b' }}>{item.title}</div>
+                      <div style={{ color: '#b91c1c', marginTop: 2 }}>{item.company} • Due {item.dueDate}</div>
                     </div>
                   ))}
                 </div>
@@ -202,18 +237,17 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
             </div>
           )}
         </div>
+
         {/* Logout Button */}
-<button
-  type="button"
-  className="btn btn-secondary btn-sm"
-  onClick={handleLogout}
-  title="Logout"
->
-  <LogOut size={16} />
-  <span>Logout</span>
-</button>
-
-
+        <button
+          type="button"
+          className="btn btn-secondary btn-sm"
+          onClick={handleLogout}
+          title="Logout of session"
+        >
+          <LogOut size={15} />
+          <span>Logout</span>
+        </button>
 
         {/* User Profile */}
         <div
@@ -236,21 +270,15 @@ export const Header = ({ onOpenAddLead, onToggleMobileSidebar }) => {
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              fontSize: '0.8rem'
+              fontSize: '0.8rem',
+              letterSpacing: '0.02em'
             }}
           >
-            {(currentUser?.fullName || currentUser?.name || currentUser?.email || 'User')
-            .trim()
-  .split(/\s+/)
-  .map(part => part[0])
-  .slice(0,2)
-  .join('')
-  
-  .toUpperCase()}
+            {userInitials}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
-              {currentUser?.fullName || currentUser?.name || currentUser?.email || 'User'}
+              {userDisplayName}
             </span>
             <span style={{ fontSize: '0.7rem', color: '#64748b', lineHeight: 1.2 }}>
               {currentUser?.role || 'Employee'}
