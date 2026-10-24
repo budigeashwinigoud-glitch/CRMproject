@@ -3,7 +3,7 @@
 **Author / Maintainer:** Pavan (Backend Engineer)  
 **Technology Stack:** Python 3.13, FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2, PyJWT, bcrypt, openpyxl, pandas  
 **Database:** SQLite (`crm.db` for local development) & PostgreSQL compatible with automated Alembic migrations  
-**Test Suite Status:** **44 / 44 tests passed (100% pass rate)**
+**Test Suite Status:** **46 / 46 tests passed (100% pass rate)**
 
 ---
 
