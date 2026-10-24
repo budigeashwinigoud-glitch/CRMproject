@@ -1,3 +1,4 @@
+from app.services.ml_model import predict_lead_propensity
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
@@ -21,27 +22,39 @@ from app.services.duplicate_service import check_lead_duplicates
 
 def get_lead_insights(lead: Lead) -> AILeadInsightsResponse:
     """
-    Returns AI-driven insights for a lead, incorporating current ML score,
-    heuristic feature importance factors, stage recommendation, and next actions.
-    Accurately returns persisted conversion_probability when available.
+    Returns AI-driven insights for a lead using a trained Scikit-Learn GradientBoosting
+    classification model. Computes calibrated probability, key feature importances,
+    and stage recommendations.
     """
-    score = lead.ai_score if lead.ai_score is not None else 70
-    prob = lead.conversion_probability if lead.conversion_probability is not None else round(score / 100.0, 2)
-    
-    # Heuristic key factors based on lead data
-    key_factors = []
+    # Run Scikit-Learn ML Inference
+    ml_score, ml_prob, ml_factors, ml_stage = predict_lead_propensity({
+        "expected_value": lead.expected_value,
+        "priority": lead.priority,
+        "lead_source": lead.lead_source,
+        "pipeline_stage": lead.pipeline_stage,
+        "phone": lead.phone,
+        "email": lead.email,
+        "notes": lead.notes
+    })
+
+    score = lead.ai_score if lead.ai_score is not None else ml_score
+    prob = lead.conversion_probability if lead.conversion_probability is not None else ml_prob
+
+    # Feature importance factors from Scikit-Learn model
+    key_factors = ml_factors.copy() if ml_factors else []
     if lead.expected_value and lead.expected_value >= 50000:
-        key_factors.append(f"High deal value ({lead.currency} {lead.expected_value:,.0f}) indicates strong enterprise scope")
+        factor_str = f"High deal value ({lead.currency} {lead.expected_value:,.0f}) indicates strong enterprise scope"
+        if factor_str not in key_factors:
+            key_factors.append(factor_str)
     if lead.lead_source in ["Referral", "Meta Lead Ads"]:
-        key_factors.append(f"High-intent acquisition channel: {lead.lead_source}")
-    if lead.priority in ["High", "Urgent"]:
-        key_factors.append("Marked high priority by commercial team")
+        src_str = f"High-intent acquisition channel: {lead.lead_source}"
+        if src_str not in key_factors:
+            key_factors.append(src_str)
     if not key_factors:
-        key_factors.append(f"Category match: {lead.lead_category or 'Fintech / Banking'}")
-        key_factors.append("Standard progression pipeline indicators")
+        key_factors.append(f"Domain fit: {lead.lead_category or 'Creative & Brand Growth'}")
 
     # Recommended stage
-    rec_stage = lead.pipeline_stage or "Contacted"
+    rec_stage = ml_stage if ml_stage else (lead.pipeline_stage or "Contacted")
     if score >= 85 and lead.pipeline_stage in ["New", "Contacted"]:
         rec_stage = "Qualified"
     elif score >= 90 and lead.pipeline_stage == "Qualified":
@@ -51,12 +64,12 @@ def get_lead_insights(lead: Lead) -> AILeadInsightsResponse:
     next_actions = [
         f"Schedule executive alignment call with {lead.full_name}",
         f"Send Belvo Creative Portfolio and branding strategy tailored for {lead.company}",
-        "Confirm budget and Q4 procurement timeline"
+        "Confirm project scope and creative roadmap"
     ]
 
     summary = lead.ai_summary or (
         f"{lead.company} is an active prospect evaluated for Belvo brand strategy and creative scaling solutions. "
-        f"Propensity score of {score}/100 based on enterprise tier and domain fit."
+        f"ML Propensity score of {score}/100 based on enterprise tier and domain fit."
     )
 
     return AILeadInsightsResponse(

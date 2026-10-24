@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     # External Provider Live Status Configuration
     GOOGLE_CALENDAR_CLIENT_ID: Optional[str] = os.getenv("GOOGLE_CALENDAR_CLIENT_ID", None)
     MICROSOFT_GRAPH_CLIENT_ID: Optional[str] = os.getenv("MICROSOFT_GRAPH_CLIENT_ID", None)
+    GOOGLE_CALENDAR_CLIENT_SECRET: Optional[str] = os.getenv("GOOGLE_CALENDAR_CLIENT_SECRET", None)
+    MICROSOFT_GRAPH_CLIENT_SECRET: Optional[str] = os.getenv("MICROSOFT_GRAPH_CLIENT_SECRET", None)
+    OAUTH_REDIRECT_BASE_URL: str = os.getenv("OAUTH_REDIRECT_BASE_URL", "http://localhost:8000/api/integrations/oauth")
 
     # AI / LLM Configuration
     OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY", None)
