@@ -150,9 +150,48 @@ def generate_message_draft(lead: Lead, req: AIMessageDraftRequest) -> AIMessageD
     tone = (req.tone or "Professional").capitalize()
     objective = req.objective or "Follow up on agency partnership and scope"
 
-    # Attempt Live LLM Generation if API Key is configured
-    llm_key = settings.OPENAI_API_KEY or os.getenv("OPENAI_API_KEY") or os.getenv("GEMINI_API_KEY")
-    if llm_key:
+    # 1. Attempt Live LLM Generation via Google Gemini (Free Tier / No Credit Card Required)
+    gemini_key = getattr(settings, "GEMINI_API_KEY", None) or os.getenv("GEMINI_API_KEY")
+    if gemini_key:
+        try:
+            prompt = (
+                f"You are an AI sales copywriter for Belvo Creative Agency (belvo.buzz). "
+                f"Write a {tone.lower()} {channel} outreach message for Belvo to {lead.full_name} at {lead.company}.\n"
+                f"Service category: {lead.lead_category or 'Brand Building & Web Development'}.\n"
+                f"Stage: {lead.pipeline_stage}. Estimated value: {lead.currency} {lead.expected_value or 0}.\n"
+                f"Objective: {objective}.\n"
+                f"Always include the brand name 'Belvo'. Keep it concise, engaging, and professional without markdown asterisks."
+            )
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.7, "maxOutputTokens": 300}
+            }
+            with httpx.Client(timeout=8.0) as client:
+                res = client.post(url, json=payload)
+                if res.status_code == 200:
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts and "text" in parts[0]:
+                            generated_text = parts[0]["text"].strip()
+                            subject_line = f"Belvo & {lead.company} — Brand Acceleration Roadmap" if channel == "Email" else None
+                            return AIMessageDraftResponse(
+                                leadId=lead.id,
+                                channel=channel,
+                                subject=subject_line,
+                                bodyDraft=generated_text,
+                                suggestedSendTime="Tomorrow at 10:00 AM Local Time",
+                                confidence=0.98,
+                                isHeuristicTemplate=False
+                            )
+        except Exception:
+            pass  # Fall back to OpenAI or calibrated agency templates
+
+    # 2. Attempt Live LLM Generation via OpenAI if configured
+    openai_key = getattr(settings, "OPENAI_API_KEY", None) or os.getenv("OPENAI_API_KEY")
+    if openai_key:
         try:
             prompt = (
                 f"Write a {tone.lower()} {channel} outreach message for Belvo Creative Agency to {lead.full_name} at {lead.company}.\n"
@@ -164,7 +203,7 @@ def generate_message_draft(lead: Lead, req: AIMessageDraftRequest) -> AIMessageD
             with httpx.Client(timeout=6.0) as client:
                 res = client.post(
                     "https://api.openai.com/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {llm_key}"},
+                    headers={"Authorization": f"Bearer {openai_key}"},
                     json={
                         "model": getattr(settings, "OPENAI_MODEL", "gpt-4o-mini"),
                         "messages": [
